@@ -2,7 +2,6 @@ from random import shuffle, randrange
 import cProfile
 import sys
 import random
-import pickle
 import os
 import logging
 from logging.handlers import RotatingFileHandler
@@ -66,6 +65,8 @@ logger.addHandler(stream_handler)
     Functions handling exchanges between
     the players and the server.
 """
+
+
 def send_json_to_player(player, data):
     """
         Converts a python object to json and send it to a client.
@@ -111,10 +112,13 @@ def ask_question_json(player, question):
 """
     game
 """
+
+
 class Character:
     """
         Class representing the eight possible characters of the game.
     """
+
     def __init__(self, color):
         self.color, self.suspect, self.position, self.power = color, True, 0, True
 
@@ -144,17 +148,16 @@ class Player:
         self.numero = n
         self.role = "inspector" if n == 0 else "fantom"
 
-
     def play(self, game):
         logger.info("--\n"+self.role+" plays\n--")
 
         charact = self.select(game.active_tiles,
-                        game.update_game_state())
+                              game.update_game_state())
 
         moved_characters = self.activate_power(charact,
-                                   game,
-                                   before | two,
-                                   game.update_game_state())
+                                               game,
+                                               before | two,
+                                               game.update_game_state())
 
         self.move(charact,
                   moved_characters,
@@ -165,7 +168,6 @@ class Player:
                             game,
                             after | two,
                             game.update_game_state())
-
 
     def select(self, t, game_state):
         """
@@ -307,7 +309,7 @@ class Player:
 
                 # brown character
                 if charact.color == "brown":
-                    # the brown character can take other characters with him 
+                    # the brown character can take other characters with him
                     # when moving.
                     return [q for q in game.characters if charact.position == q.position]
 
@@ -430,6 +432,7 @@ class Game:
         Class representing a full game until either the inspector
         of the fantom wins.
     """
+
     def __init__(self, players):
         self.players = players
         self.position_carlotta, self.exit, self.num_tour, self.shadow, x = 4, 22, 1, randrange(
@@ -459,7 +462,7 @@ class Game:
         self.characters_display = [character.display() for character in
                                    self.characters]
         self.tiles_display = [tile.display() for tile in
-                               self.tiles]
+                              self.tiles]
 
         self.game_state = {
             "position_carlotta": self.position_carlotta,
@@ -498,7 +501,8 @@ class Game:
                 if len(gens) == 1 or piece == self.shadow:
                     for p in gens:
                         p.suspect = False
-        self.position_carlotta += len([p for p in self.characters if p.suspect])
+        self.position_carlotta += len(
+            [p for p in self.characters if p.suspect])
 
     def tour(self):
         # log
@@ -528,9 +532,11 @@ class Game:
         else:
             logger.info("----------\n---- fantom wins")
         # log
-        logger.info(f"---- final position of Carlotta : {self.position_carlotta}")
+        logger.info(
+            f"---- final position of Carlotta : {self.position_carlotta}")
         logger.info(f"---- exit : {self.exit}")
-        logger.info(f"---- final score : {self.exit-self.position_carlotta}\n----------")
+        logger.info(
+            f"---- final score : {self.exit-self.position_carlotta}\n----------")
         return self.exit - self.position_carlotta
 
     def __repr__(self):
@@ -548,7 +554,7 @@ class Game:
         self.characters_display = [character.display() for character in
                                    self.characters]
         self.tiles_display = [tile.display() for tile in
-                               self.tiles]
+                              self.tiles]
         # update
         self.game_state = {
             "position_carlotta": self.position_carlotta,
