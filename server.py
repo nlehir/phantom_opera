@@ -9,7 +9,6 @@ import json
 import socket
 import protocol
 
-
 """
     server setup
 """
@@ -280,6 +279,7 @@ class Player:
                     # logger.debug("Rappel des positions :\n" + str(game))
 
                     available_characters = list(colors)
+                    available_characters.remove("purple")
                     question = {"question type": "purple character power",
                                 "data": available_characters,
                                 "game state": game_state}
