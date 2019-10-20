@@ -1,7 +1,7 @@
 .DS_Store
 *.swp
 *.swo
-server_enzo.py
+server_nz.py
 backup/*
 logs/*
 __pycache__/*
