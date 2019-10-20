@@ -3,5 +3,8 @@
 *.swo
 server_nz.py
 backup/*
-logs/*
+logs/fantom.log
+logs/game.log
+logs/inspector.log
+logs/profiling.txt
 __pycache__/*
