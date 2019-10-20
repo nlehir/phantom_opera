@@ -4,3 +4,4 @@
 server_enzo.py
 backup/*
 logs/*
+__pycache__/*
