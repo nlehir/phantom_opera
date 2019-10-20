@@ -151,22 +151,22 @@ class Player:
         logger.info("--\n"+self.role+" plays\n--")
 
         charact = self.select(game.active_tiles,
-                              game.update_game_state())
+                              game.update_game_state(self.role))
 
         moved_characters = self.activate_power(charact,
                                                game,
                                                before | two,
-                                               game.update_game_state())
+                                               game.update_game_state(self.role))
 
         self.move(charact,
                   moved_characters,
                   game.blocked,
-                  game.update_game_state())
+                  game.update_game_state(self.role))
 
         self.activate_power(charact,
                             game,
                             after | two,
-                            game.update_game_state())
+                            game.update_game_state(self.role))
 
     def select(self, t, game_state):
         """
@@ -447,7 +447,7 @@ class Game:
         self.fantom = self.cards[randrange(8)]
         logger.info("the fantom is " + self.fantom.color)
         self.cards.remove(self.fantom)
-        self.cards += ['fantom']*3
+        self.cards += ["fantom"]*3
 
         # log
         logger.info("\n=======\nnew game\n=======")
@@ -508,7 +508,7 @@ class Game:
         # log
         logger.info("\n------------------")
         logger.info(self)
-        logger.debug(json.dumps(self.update_game_state(), indent=4))
+        logger.debug(json.dumps(self.update_game_state(""), indent=4))
 
         # work
         self.actions()
@@ -547,7 +547,7 @@ class Game:
         message += "".join(["\n"+str(p) for p in self.characters])
         return message
 
-    def update_game_state(self):
+    def update_game_state(self, player_role):
         """
             representation of the global state of the game.
         """
@@ -556,6 +556,7 @@ class Game:
         self.tiles_display = [tile.display() for tile in
                               self.tiles]
         # update
+
         self.game_state = {
             "position_carlotta": self.position_carlotta,
             "exit": self.exit,
@@ -566,8 +567,10 @@ class Game:
             "tiles": self.tiles_display,
         }
 
-        return self.game_state
+        if (player_role == "fantom"):
+            self.game_state["fantom"] = self.fantom.color
 
+        return self.game_state
 
 players = [Player(0), Player(1)]
 scores = []
