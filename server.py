@@ -14,6 +14,7 @@ import protocol
 """
 link = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # link.setsockopt(socket.IPPROTO_TCP, socket.SO_REUSEADDR, 1)
+# link.setsockopt(socket.SO_REUSEADDR, 1)
 host = ''
 port = 12000
 link.bind((host, port))
@@ -243,14 +244,17 @@ class Player:
 
                 # white character
                 if charact.color == "white":
-                    for q in game.characters:
-                        if q.position == charact.position and charact != q:
+                    for moved_character in game.characters:
+                        if moved_character.position == charact.position and charact != moved_character:
                             disp = {
-                                x for x in passages[charact.position] if x not in game.blocked or q.position not in game.blocked}
+                                x for x in passages[charact.position] if x not
+                                in game.blocked or moved_character.position not in game.blocked}
 
                             # edit
                             available_positions = list(disp)
-                            question = {"question type": "white character power",
+                            # format to string
+                            character_to_move=str(moved_character).split("-")[0]
+                            question = {"question type": "white character power move "+character_to_move,
                                         "data": available_positions,
                                         "game state": game_state}
                             selected_index = ask_question_json(self, question)
@@ -271,8 +275,8 @@ class Player:
                                 f"question : {question['question type']}")
                             logger.info("answer : " +
                                         str(selected_position))
-                            q.position = selected_position
-                            logger.info("new position : "+str(q))
+                            moved_character.position = selected_position
+                            logger.info("new position : "+str(moved_character))
 
                 # purple character
                 if charact.color == "purple":

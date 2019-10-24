@@ -1,0 +1,6 @@
+perso bleu : peut bloquer tout passage alors que dans le jeu que les salles
+adjacentes
+
+dire le personnage  pour le pouvoir blanc
+
+est-ce qu'il faut update le game state plus souvent
