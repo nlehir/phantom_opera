@@ -1,0 +1,10 @@
+10/10/2019
+The purple character cannot swap position with itself.
+
+20/10/2019
+The server tells the fantom it's identity when asking questions.
+
+24/10/2019
+White ability : white character knows which character he is moving
+
+Socket : add option to relaunch immediatly after end of game.

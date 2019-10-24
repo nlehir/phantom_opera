@@ -251,7 +251,7 @@ class Player:
 
                             # edit
                             available_positions = list(disp)
-                            # format to string
+                            # format the name of the moved character to string
                             character_to_move=str(moved_character).split("-")[0]
                             question = {"question type": "white character power move "+character_to_move,
                                         "data": available_positions,
