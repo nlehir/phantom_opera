@@ -13,8 +13,7 @@ import protocol
     server setup
 """
 link = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# link.setsockopt(socket.IPPROTO_TCP, socket.SO_REUSEADDR, 1)
-# link.setsockopt(socket.SO_REUSEADDR, 1)
+link.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 host = ''
 port = 12000
 link.bind((host, port))
