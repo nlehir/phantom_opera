@@ -150,6 +150,7 @@ class Player:
     def play(self, game):
         logger.info("--\n"+self.role+" plays\n--")
 
+        logger.debug(json.dumps(game.update_game_state(""), indent=4))
         charact = self.select(game.active_tiles,
                               game.update_game_state(self.role))
 
@@ -252,7 +253,8 @@ class Player:
                             # edit
                             available_positions = list(disp)
                             # format the name of the moved character to string
-                            character_to_move=str(moved_character).split("-")[0]
+                            character_to_move = str(
+                                moved_character).split("-")[0]
                             question = {"question type": "white character power move "+character_to_move,
                                         "data": available_positions,
                                         "game state": game_state}
@@ -445,6 +447,7 @@ class Game:
         self.characters = {Character(c) for c in colors}
         # tiles are used to draw characters
         self.tiles = [p for p in self.characters]
+        self.active_tiles = []
         # cards are for the red character
         self.cards = self.tiles[:]
         self.fantom = self.cards[randrange(8)]
@@ -466,6 +469,8 @@ class Game:
                                    self.characters]
         self.tiles_display = [tile.display() for tile in
                               self.tiles]
+        self.active_tiles_display = [tile.display() for tile in
+                                     self.active_tiles]
 
         self.game_state = {
             "position_carlotta": self.position_carlotta,
@@ -474,7 +479,7 @@ class Game:
             "shadow": self.shadow,
             "blocked": self.blocked_list,
             "characters": self.characters_display,
-            "tiles": self.tiles_display,
+            "active tiles": self.active_tiles_display,
         }
 
     def actions(self):
@@ -558,6 +563,8 @@ class Game:
                                    self.characters]
         self.tiles_display = [tile.display() for tile in
                               self.tiles]
+        self.active_tiles_display = [tile.display() for tile in
+                                     self.active_tiles]
         # update
 
         self.game_state = {
@@ -567,13 +574,14 @@ class Game:
             "shadow": self.shadow,
             "blocked": self.blocked_list,
             "characters": self.characters_display,
-            "tiles": self.tiles_display,
+            "active tiles": self.active_tiles_display,
         }
 
         if (player_role == "fantom"):
             self.game_state["fantom"] = self.fantom.color
 
         return self.game_state
+
 
 players = [Player(0), Player(1)]
 scores = []
