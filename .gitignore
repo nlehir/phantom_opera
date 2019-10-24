@@ -8,4 +8,4 @@ logs/game.log
 logs/inspector.log
 logs/profiling.txt
 __pycache__/*
-serveur_vs_jeu.txt
+server_vs_jeu.txt
