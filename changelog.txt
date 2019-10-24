@@ -8,3 +8,5 @@ The server tells the fantom it's identity when asking questions.
 White ability : white character knows which character he is moving
 
 Socket : add option to relaunch immediatly after end of game.
+
+Logging : only log active tiles. (available characters to play)
