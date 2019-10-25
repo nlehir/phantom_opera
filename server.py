@@ -26,14 +26,13 @@ clients = []
 """
 # determines whether the power of the character is used before
 # or after moving
-permanents, two, before, after = {'pink'}, {
-    'red', 'grey', 'blue'}, {'purple', 'brown'}, {'black', 'white'}
+permanents, two, before, after = {'lady'}, {'card_picker', 'electrician', 'janitor'}, {'swapper', 'carpooler'}, {'attractor', 'repulsive'}
 # reunion of sets
 colors = before | permanents | after | two
 # ways between rooms
 passages = [{1, 4}, {0, 2}, {1, 3}, {2, 7}, {0, 5, 8},
             {4, 6}, {5, 7}, {3, 6, 9}, {4, 9}, {7, 8}]
-# ways for the pink character
+# ways for the lady character
 pink_passages = [{1, 4}, {0, 2, 5, 7}, {1, 3, 6}, {2, 7}, {0, 5, 8, 9}, {
     4, 6, 1, 8}, {5, 7, 2, 9}, {3, 6, 9, 1}, {4, 9, 5}, {7, 8, 4, 6}]
 
@@ -225,8 +224,8 @@ class Player:
                 logger.info(charact.color + " power activated")
                 charact.power = False
 
-                # red character
-                if charact.color == "red":
+                # card_picker character
+                if charact.color == "card_picker":
                     draw = game.cards[0]
                     logger.info(str(draw) + " was drawn")
                     if draw == "fantom":
@@ -235,15 +234,15 @@ class Player:
                         draw.suspect = False
                     del game.cards[0]
 
-                # black character
-                if charact.color == "black":
+                # attractor character
+                if charact.color == "attractor":
                     for q in game.characters:
                         if q.position in {x for x in passages[charact.position] if x not in game.blocked or q.position not in game.blocked}:
                             q.position = charact.position
                             logger.info("new position : "+str(q))
 
-                # white character
-                if charact.color == "white":
+                # repulsive character
+                if charact.color == "repulsive":
                     for moved_character in game.characters:
                         if moved_character.position == charact.position and charact != moved_character:
                             disp = {
@@ -255,7 +254,7 @@ class Player:
                             # format the name of the moved character to string
                             character_to_move = str(
                                 moved_character).split("-")[0]
-                            question = {"question type": "white character power move "+character_to_move,
+                            question = {"question type": "repulsive character power move "+character_to_move,
                                         "data": available_positions,
                                         "game state": game_state}
                             selected_index = ask_question_json(self, question)
@@ -279,13 +278,13 @@ class Player:
                             moved_character.position = selected_position
                             logger.info("new position : "+str(moved_character))
 
-                # purple character
-                if charact.color == "purple":
+                # swapper character
+                if charact.color == "swapper":
                     # logger.debug("Rappel des positions :\n" + str(game))
 
                     available_characters = list(colors)
-                    available_characters.remove("purple")
-                    question = {"question type": "purple character power",
+                    available_characters.remove("swapper")
+                    question = {"question type": "swapper character power",
                                 "data": available_characters,
                                 "game state": game_state}
                     selected_index = ask_question_json(self, question)
@@ -312,17 +311,17 @@ class Player:
                     logger.info("new position : "+str(charact))
                     logger.info("new position : "+str(selected_crctr))
 
-                # brown character
-                if charact.color == "brown":
-                    # the brown character can take other characters with him
+                # carpooler character
+                if charact.color == "carpooler":
+                    # the carpooler character can take other characters with him
                     # when moving.
                     return [q for q in game.characters if charact.position == q.position]
 
-                # grey character
-                if charact.color == "grey":
+                # electrician character
+                if charact.color == "electrician":
 
                     available_rooms = [room for room in range(10)]
-                    question = {"question type": "grey character power",
+                    question = {"question type": "electrician character power",
                                 "data": available_rooms,
                                 "game state": game_state}
                     selected_index = ask_question_json(self, question)
@@ -345,12 +344,12 @@ class Player:
                     logger.info(f"question : {question['question type']}")
                     logger.info("answer : "+str(game.shadow))
 
-                # blue character
-                if charact.color == "blue":
+                # janitor character
+                if charact.color == "janitor":
 
                     # choose room
                     available_rooms = [room for room in range(10)]
-                    question = {"question type": "blue character power room",
+                    question = {"question type": "janitor character power room",
                                 "data": available_rooms,
                                 "game state": game_state}
                     selected_index = ask_question_json(self, question)
@@ -372,7 +371,7 @@ class Player:
                     # choose exit
                     passages_work = passages[selected_room].copy()
                     available_exits = list(passages_work)
-                    question = {"question type": "blue character power exit",
+                    question = {"question type": "janitor character power exit",
                                 "data": available_exits,
                                 "game state": game_state}
                     selected_index = ask_question_json(self, question)
@@ -399,8 +398,8 @@ class Player:
         """
             Select a new position for the character.
         """
-        pass_act = pink_passages if charact.color == 'pink' else passages
-        if charact.color != 'purple' or charact.power:
+        pass_act = pink_passages if charact.color == 'lady' else passages
+        if charact.color != 'swapper' or charact.power:
             disp = {x for x in pass_act[charact.position]
                     if charact.position not in blocked or x not in blocked}
 
@@ -448,7 +447,7 @@ class Game:
         # tiles are used to draw characters
         self.tiles = [p for p in self.characters]
         self.active_tiles = []
-        # cards are for the red character
+        # cards are for the card_picker character
         self.cards = self.tiles[:]
         self.fantom = self.cards[randrange(8)]
         logger.info("the fantom is " + self.fantom.color)
