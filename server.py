@@ -345,7 +345,7 @@ class Player:
                     logger.info(f"question : {question['question type']}")
                     logger.info("answer : "+str(game.shadow))
 
-                # blue character
+            # blue character
                 if charact.color == "blue":
 
                     # choose room
@@ -393,6 +393,7 @@ class Player:
                     logger.info("answer : " +
                                 str({selected_room, selected_exit}))
                     game.blocked = {selected_room, selected_exit}
+                    game.blocked_list = list(game.blocked)
         return [charact]
 
     def move(self, charact, moved_characters, blocked, game_state):
@@ -445,7 +446,9 @@ class Game:
         self.blocked = {x, passages[x].copy().pop()}
         self.blocked_list = list(self.blocked)
         self.characters = {Character(c) for c in colors}
-        # tiles are used to draw characters
+        # tiles are used to draw 4 characters at the beginning
+        # of each round
+        # tile means 'tuile'
         self.tiles = [p for p in self.characters]
         self.active_tiles = []
         # cards are for the red character
