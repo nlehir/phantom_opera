@@ -10,3 +10,9 @@ White ability : white character knows which character he is moving
 Socket : add option to relaunch immediatly after end of game.
 
 Logging : only log active tiles. (available characters to play)
+
+26/10/2019
+Add pdf rules to the repo.
+
+27/10/2019
+Blue power : blocked_list is correctly updated so that game_state is accurate.
