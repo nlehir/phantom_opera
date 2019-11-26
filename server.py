@@ -482,18 +482,26 @@ class Game:
             "shadow": self.shadow,
             "blocked": self.blocked_list,
             "characters": self.characters_display,
+            "tiles": self.tiles_display,
             "active tiles": self.active_tiles_display,
         }
 
     def actions(self):
-        player_actif = self.num_tour % 2
-        if player_actif == 1:
+        # phase = tour
+        # phase 1 : IFFI
+        # phase 2 : FIIF
+        # first phase : initially num_tour = 1, then 3, 5, etc.
+        # so the first player to play is (1+1)%2=0 (inspector)
+        # second phase : num_tour = 2, 4, 6, 8, etc.
+        # so the first player to play is (2+1)%2=1 (fantom)
+        first_player_in_phase = (self.num_tour + 1) % 2
+        if first_player_in_phase == 0:
             logger.info(f"-\nshuffle {len(self.tiles)} tiles\n-")
             shuffle(self.tiles)
             self.active_tiles = self.tiles[:4]
         else:
             self.active_tiles = self.tiles[4:]
-        for i in [player_actif, 1-player_actif, 1-player_actif, player_actif]:
+        for i in [first_player_in_phase, 1-first_player_in_phase, 1-first_player_in_phase, first_player_in_phase]:
             self.players[i].play(self)
 
     def lumiere(self):
@@ -577,6 +585,7 @@ class Game:
             "shadow": self.shadow,
             "blocked": self.blocked_list,
             "characters": self.characters_display,
+            "tiles": self.tiles_display,
             "active tiles": self.active_tiles_display,
         }
 
