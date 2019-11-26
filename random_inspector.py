@@ -1,11 +1,11 @@
-import socket
-import os
-import logging
-from logging.handlers import RotatingFileHandler
 import json
-import protocol
-from random import randrange
+import logging
+import os
 import random
+import socket
+from logging.handlers import RotatingFileHandler
+
+import protocol
 
 host = "localhost"
 port = 12000
