@@ -20,6 +20,7 @@ def init_connexion():
         clients.append(clientsocket)
         clientsocket.settimeout(500)
 
+
 if __name__ == '__main__':
     players = [Player(0), Player(1)]
     scores = []
