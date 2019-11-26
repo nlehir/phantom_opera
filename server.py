@@ -20,7 +20,6 @@ link.bind((host, port))
 # list that will later contain the sockets
 clients = []
 
-
 """
     game data
 """
@@ -36,7 +35,6 @@ passages = [{1, 4}, {0, 2}, {1, 3}, {2, 7}, {0, 5, 8},
 # ways for the pink character
 pink_passages = [{1, 4}, {0, 2, 5, 7}, {1, 3, 6}, {2, 7}, {0, 5, 8, 9}, {
     4, 6, 1, 8}, {5, 7, 2, 9}, {3, 6, 9, 1}, {4, 9, 5}, {7, 8, 4, 6}]
-
 
 """
     logging setup
@@ -58,7 +56,6 @@ logger.addHandler(file_handler)
 stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.DEBUG)
 logger.addHandler(stream_handler)
-
 
 """
     Functions handling exchanges between
@@ -148,7 +145,7 @@ class Player:
         self.role = "inspector" if n == 0 else "fantom"
 
     def play(self, game):
-        logger.info("--\n"+self.role+" plays\n--")
+        logger.info("--\n" + self.role + " plays\n--")
 
         logger.debug(json.dumps(game.update_game_state(""), indent=4))
         charact = self.select(game.active_tiles,
@@ -188,7 +185,7 @@ class Player:
                 'available characters. Choosing random character.'
             )
             logger.warning(warning_message)
-            selected_character = random.randint(0, len(t)-1)
+            selected_character = random.randint(0, len(t) - 1)
 
         perso = t[selected_character]
 
@@ -238,24 +235,25 @@ class Player:
                 # black character
                 if charact.color == "black":
                     for q in game.characters:
-                        if q.position in {x for x in passages[charact.position] if x not in game.blocked or q.position not in game.blocked}:
+                        if q.position in {x for x in passages[charact.position] if
+                                          x not in game.blocked or q.position not in game.blocked}:
                             q.position = charact.position
-                            logger.info("new position : "+str(q))
+                            logger.info("new position : " + str(q))
 
                 # white character
                 if charact.color == "white":
                     for moved_character in game.characters:
                         if moved_character.position == charact.position and charact != moved_character:
                             disp = {
-                                x for x in passages[charact.position] if x not
-                                in game.blocked or moved_character.position not in game.blocked}
+                                x for x in passages[charact.position]
+                                if x not in game.blocked or moved_character.position not in game.blocked}
 
                             # edit
                             available_positions = list(disp)
                             # format the name of the moved character to string
                             character_to_move = str(
                                 moved_character).split("-")[0]
-                            question = {"question type": "white character power move "+character_to_move,
+                            question = {"question type": "white character power move " + character_to_move,
                                         "data": available_positions,
                                         "game state": game_state}
                             selected_index = ask_question_json(self, question)
@@ -277,7 +275,7 @@ class Player:
                             logger.info("answer : " +
                                         str(selected_position))
                             moved_character.position = selected_position
-                            logger.info("new position : "+str(moved_character))
+                            logger.info("new position : " + str(moved_character))
 
                 # purple character
                 if charact.color == "purple":
@@ -303,14 +301,14 @@ class Player:
                         selected_character = available_characters[selected_index]
 
                     logger.info(f"question : {question['question type']}")
-                    logger.info("answer : "+selected_character)
+                    logger.info("answer : " + selected_character)
 
                     # y a pas plus simple ?
                     selected_crctr = [x for x in game.characters if x.color
                                       == selected_character][0]
                     charact.position, selected_crctr.position = selected_crctr.position, charact.position
-                    logger.info("new position : "+str(charact))
-                    logger.info("new position : "+str(selected_crctr))
+                    logger.info("new position : " + str(charact))
+                    logger.info("new position : " + str(selected_crctr))
 
                 # brown character
                 if charact.color == "brown":
@@ -335,7 +333,7 @@ class Player:
                         )
                         logger.warning(warning_message)
                         selected_index = random.randint(
-                            0, len(available_rooms)-1)
+                            0, len(available_rooms) - 1)
                         selected_room = available_rooms[selected_index]
 
                     else:
@@ -343,9 +341,9 @@ class Player:
 
                     game.shadow = selected_room
                     logger.info(f"question : {question['question type']}")
-                    logger.info("answer : "+str(game.shadow))
+                    logger.info("answer : " + str(game.shadow))
 
-            # blue character
+                # blue character
                 if charact.color == "blue":
 
                     # choose room
@@ -363,7 +361,7 @@ class Player:
                         )
                         logger.warning(warning_message)
                         selected_index = random.randint(
-                            0, len(available_rooms)-1)
+                            0, len(available_rooms) - 1)
                         selected_room = available_rooms[selected_index]
 
                     else:
@@ -424,13 +422,13 @@ class Player:
                 selected_position = available_positions[selected_index]
 
             logger.info(f"question : {question['question type']}")
-            logger.info("answer : "+str(selected_position))
+            logger.info("answer : " + str(selected_position))
 
             if len(moved_characters) > 1:
                 logger.debug("more than one character moves")
             for q in moved_characters:
                 q.position = selected_position
-                logger.info("new position : "+str(q))
+                logger.info("new position : " + str(q))
 
 
 class Game:
@@ -456,7 +454,7 @@ class Game:
         self.fantom = self.cards[randrange(8)]
         logger.info("the fantom is " + self.fantom.color)
         self.cards.remove(self.fantom)
-        self.cards += ["fantom"]*3
+        self.cards += ["fantom"] * 3
 
         # log
         logger.info("\n=======\nnew game\n=======")
@@ -555,7 +553,7 @@ class Game:
             f"---- final position of Carlotta : {self.position_carlotta}")
         logger.info(f"---- exit : {self.exit}")
         logger.info(
-            f"---- final score : {self.exit-self.position_carlotta}\n----------")
+            f"---- final score : {self.exit - self.position_carlotta}\n----------")
         return self.exit - self.position_carlotta
 
     def __repr__(self):
@@ -563,7 +561,7 @@ class Game:
         message += f"Position Carlotta / exit: {self.position_carlotta}/{self.exit},\n"
         message += f"Shadow: {self.shadow},\n"
         message += f"blocked: {self.blocked}"
-        message += "".join(["\n"+str(p) for p in self.characters])
+        message += "".join(["\n" + str(p) for p in self.characters])
         return message
 
     def update_game_state(self, player_role):
@@ -589,7 +587,7 @@ class Game:
             "active tiles": self.active_tiles_display,
         }
 
-        if (player_role == "fantom"):
+        if player_role == "fantom":
             self.game_state["fantom"] = self.fantom.color
 
         return self.game_state
