@@ -22,7 +22,7 @@ class Player:
         logger.info("--\n" + self.role + " plays\n--")
 
         logger.debug(json.dumps(game.update_game_state(""), indent=4))
-        charact = self.select(game.active_tiles,
+        charact = self.select(game.active_cards,
                               game.update_game_state(self.role))
 
         moved_characters = self.activate_power(charact,
@@ -99,16 +99,16 @@ class Player:
                 # red character
                 if charact.color == "red":
                     # Todo: 2.Origin Should be replaced by
-                    #  draw = random.choice(game.cards)
-                    #  game.cards.remove(draw)
-                    draw = game.cards[0]
+                    #  draw = random.choice(game.alibi_cards)
+                    #  game.alibi_cards.remove(draw)
+                    draw = game.alibi_cards[0]
                     logger.info(str(draw) + " was drawn")
                     if draw == "fantom":
                         game.position_carlotta += -1 if self.num == 0 else 1
                     elif self.num == 0:
                         draw.suspect = False
                     # Todo: 2 Should be removed
-                    del game.cards[0]
+                    del game.alibi_cards[0]
 
                 # black character
                 if charact.color == "black":
