@@ -127,22 +127,22 @@ class Game:
                   1 - first_player_in_phase, first_player_in_phase]:
             self.players[i].play(self)
 
-    def lumiere(self):
+    def fantom_scream(self):
         partition: List[Set[Character]] = [
             {p for p in self.characters if p.position == i} for i in range(10)]
         if len(partition[self.fantom.position]) == 1 \
                 or self.fantom.position == self.shadow:
             logger.info("The fantom screams.")
             self.position_carlotta += 1
-            for piece, gens in enumerate(partition):
-                if len(gens) > 1 and piece != self.shadow:
-                    for p in gens:
+            for room, chars in enumerate(partition):
+                if len(chars) > 1 and room != self.shadow:
+                    for p in chars:
                         p.suspect = False
         else:
             logger.info("the fantom does not scream.")
-            for piece, gens in enumerate(partition):
-                if len(gens) == 1 or piece == self.shadow:
-                    for p in gens:
+            for room, chars in enumerate(partition):
+                if len(chars) == 1 or room == self.shadow:
+                    for p in chars:
                         p.suspect = False
         self.position_carlotta += len(
             [p for p in self.characters if p.suspect])
@@ -155,7 +155,7 @@ class Game:
 
         # work
         self.actions()
-        self.lumiere()
+        self.fantom_scream()
         for p in self.characters:
             p.power = True
         self.num_tour += 1
