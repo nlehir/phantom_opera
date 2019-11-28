@@ -1,6 +1,6 @@
 import json
 from random import shuffle, randrange
-from typing import List, Set, Union
+from typing import List, Set, Union, Tuple
 
 from src.Character import Character
 from src.Player import Player
@@ -17,8 +17,7 @@ class Game:
     exit: int
     num_tour: int
     shadow: int
-    blocked: Set[int]
-    blocked_list: List[Set[int]]
+    blocked: Tuple[int]
     characters: Set[Character]
     tiles: List[Character]
     active_tiles: List[Character]
@@ -41,10 +40,7 @@ class Game:
         #  occupied by the blue character pawn Madame Giry and the adjacent
         #  room clockwise.
         x: int = randrange(10)
-        # Todo: Should be a Tuple[int]
-        self.blocked = {x, passages[x].copy().pop()}
-        # Todo: Unused variable, should be removed
-        self.blocked_list = list(self.blocked)
+        self.blocked = tuple((x, passages[x].copy().pop()))
         # Todo: Should be a Dict[enum, Character]
         self.characters = set({Character(color) for color in colors})
         # tiles are used to draw 4 characters at the beginning
@@ -99,7 +95,7 @@ class Game:
             "exit": self.exit,
             "num_tour": self.num_tour,
             "shadow": self.shadow,
-            "blocked": self.blocked_list,
+            "blocked": self.blocked,
             "characters": self.characters_display,
             # Todo: should be removed
             "tiles": self.tiles_display,
@@ -210,7 +206,7 @@ class Game:
             "exit": self.exit,
             "num_tour": self.num_tour,
             "shadow": self.shadow,
-            "blocked": self.blocked_list,
+            "blocked": self.blocked,
             "characters": self.characters_display,
             # Todo: should be removed
             "tiles": self.tiles_display,

@@ -1,5 +1,6 @@
 import json
 import random
+from typing import Tuple
 
 from src.globals import passages, colors, pink_passages, before, two, after, logger
 from src.utils import ask_question_json
@@ -267,8 +268,7 @@ class Player:
                     logger.info(f"question : {question['question type']}")
                     logger.info("answer : " +
                                 str({selected_room, selected_exit}))
-                    game.blocked = {selected_room, selected_exit}
-                    game.blocked_list = list(game.blocked)
+                    game.blocked = tuple((selected_room, selected_exit))
         return [charact]
 
     def move(self, charact, moved_characters, blocked, game_state):
