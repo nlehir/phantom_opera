@@ -21,7 +21,7 @@ class Game:
     characters: Set[Character]
     character_cards: List[Character]
     active_cards: List[Character]
-    cards: List[Union[Character, str]]
+    alibi_cards: List[Union[Character, str]]
     fantom: Character
 
     # Todo: def __init__ should be __init__(self, player_1: Player, player_2:
