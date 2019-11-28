@@ -1,6 +1,5 @@
 import json
-import random
-from typing import Tuple
+from random import randint, choice
 
 from src.globals import passages, colors, pink_passages, before, two, after, logger
 from src.utils import ask_question_json
@@ -59,7 +58,7 @@ class Player:
                 'available characters. Choosing random character.'
             )
             logger.warning(warning_message)
-            selected_character = random.randint(0, len(t) - 1)
+            selected_character = randint(0, len(t) - 1)
 
         perso = t[selected_character]
 
@@ -98,7 +97,7 @@ class Player:
 
                 # red character
                 if charact.color == "red":
-                    draw = random.choice(game.alibi_cards)
+                    draw = choice(game.alibi_cards)
                     game.alibi_cards.remove(draw)
                     logger.info(str(draw) + " was drawn")
                     if draw == "fantom":
@@ -206,7 +205,7 @@ class Player:
                             'Choosing random room.'
                         )
                         logger.warning(warning_message)
-                        selected_index = random.randint(
+                        selected_index = randint(
                             0, len(available_rooms) - 1)
                         selected_room = available_rooms[selected_index]
 
@@ -234,7 +233,7 @@ class Player:
                             'Choosing random room.'
                         )
                         logger.warning(warning_message)
-                        selected_index = random.randint(
+                        selected_index = randint(
                             0, len(available_rooms) - 1)
                         selected_room = available_rooms[selected_index]
 
