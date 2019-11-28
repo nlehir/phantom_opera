@@ -98,17 +98,13 @@ class Player:
 
                 # red character
                 if charact.color == "red":
-                    # Todo: 2.Origin Should be replaced by
-                    #  draw = random.choice(game.alibi_cards)
-                    #  game.alibi_cards.remove(draw)
-                    draw = game.alibi_cards[0]
+                    draw = random.choice(game.alibi_cards)
+                    game.alibi_cards.remove(draw)
                     logger.info(str(draw) + " was drawn")
                     if draw == "fantom":
                         game.position_carlotta += -1 if self.num == 0 else 1
                     elif self.num == 0:
                         draw.suspect = False
-                    # Todo: 2 Should be removed
-                    del game.alibi_cards[0]
 
                 # black character
                 if charact.color == "black":
