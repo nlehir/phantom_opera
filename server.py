@@ -1,9 +1,12 @@
 import cProfile
 import sys
+from threading import Thread
 
 from src.Game import Game
 from src.Player import Player
 from src.globals import logger, clients, link
+import random_fantom
+import random_inspector
 
 """
     The order of connexion of the sockets is important.
@@ -19,6 +22,9 @@ def init_connexion():
         logger.info("Received client !")
         clients.append(clientsocket)
         clientsocket.settimeout(500)
+    game = Game(players)
+    game.lancer()
+    link.close()
 
 
 if __name__ == '__main__':
@@ -26,17 +32,22 @@ if __name__ == '__main__':
     scores = []
 
     logger.info("no client yet")
-    init_connexion()
+    game = Thread(target=init_connexion)
+    game.start()
+    rfantom = random_fantom.Player()
+    rfantom.start()
+    rinspector = random_inspector.Player()
+    rinspector.start()
+    game.join()
+    rfantom.join()
+    rinspector.join()
+
+    # init_connexion()
     logger.info("received all clients")
 
     # profiling
     pr = cProfile.Profile()
     pr.enable()
-
-    game = Game(players)
-    game.lancer()
-
-    link.close()
 
     # profiling
     pr.disable()
