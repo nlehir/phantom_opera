@@ -1,5 +1,5 @@
 import json
-from random import shuffle, randrange
+from random import shuffle, randrange, choice
 from typing import List, Set, Union, Tuple
 
 from src.Character import Character
@@ -42,21 +42,14 @@ class Game:
         self.characters = set({Character(color) for color in colors})
         # character_cards are used to draw 4 characters at the beginning
         # of each round
-        # tile means 'tuile'
-        # Todo: 1 Should be rename character_cards
         self.character_cards = list(self.characters)
         self.active_cards = list()
-        # Todo: Should be rename alibi_cards, declared as a List[Character]
-        #  and instanciated with self.character_cards.copy()
-        self.alibi_cards = self.character_cards[:]
-        # Todo: 2 Should use random.choice() and simplified as
-        #  self.fantom = random.choice(self.alibi_cards)
-        self.fantom = self.alibi_cards[randrange(8)]
+        self.alibi_cards = self.character_cards.copy()
+        self.fantom = choice(self.alibi_cards)
         # Todo: Should be placed in a logger section of the __init__()
         logger.info("the fantom is " + self.fantom.color)
         self.alibi_cards.remove(self.fantom)
-        # Todo: Should be replaced by self.alibi_cards.extend(['fantom'] * 3)
-        self.alibi_cards += ["fantom"] * 3
+        self.alibi_cards.extend(['fantom'] * 3)
 
         # log
         logger.info("\n=======\nnew game\n=======")
