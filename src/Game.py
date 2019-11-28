@@ -33,9 +33,6 @@ class Game:
         # Todo: Should be removed and make the game ends when carlotta reach 0.
         self.exit = 22
         self.num_tour = 1
-        # Todo: Shadow should always be placed on Joseph Buquet at the
-        #  beginning of a game.
-        self.shadow = randrange(10)
         # Todo: Lock should always block the hallway between the room
         #  occupied by the blue character pawn Madame Giry and the adjacent
         #  room clockwise.
@@ -82,8 +79,15 @@ class Game:
         for i, p in enumerate(self.tiles):
             p.position = i
 
+        for character in self.characters:
+            # get position of grey character
+            if character.display()["color"] == "grey":
+                grey_character_position = character.display()["position"]
+                self.shadow = grey_character_position
+
         self.characters_display = [character.display() for character in
                                    self.characters]
+
         # Todo: should be removed
         self.tiles_display = [tile.display() for tile in
                               self.tiles]
@@ -185,7 +189,7 @@ class Game:
             f"Position Carlotta / exit: {self.position_carlotta}/{self.exit},\n" \
             f"Shadow: {self.shadow},\n" \
             f"blocked: {self.blocked}".join(
-            ["\n" + str(p) for p in self.characters])
+                ["\n" + str(p) for p in self.characters])
         return message
 
     def update_game_state(self, player_role):
