@@ -1,0 +1,13 @@
+serveur : déplacement d'une case seulement, alors que de potentiellement plusieurs dans le serveur
+
+perso bleu : peut bloquer tout passage alors que dans le jeu que les salles adjacentes
+
+passage blocké : initialisation non aléatoire dans le jeu, aléatoire dans le serveur
+
+dire le personnage  pour le pouvoir blanc
+
+initialisation aléatoire ombre sur joseph buquet non aléaotire dans le jeu, aléatoire dans le serveur
+
+personnage brun : il déplace tous les personnages dans le serveur, pas forcément dans le jeu
+
+l'ombre doit etre déplacée sur une position différente de sa position actuelle
