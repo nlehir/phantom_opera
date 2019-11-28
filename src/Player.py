@@ -10,10 +10,12 @@ class Player:
         Class representing the players, either the inspector (player 0)
         or the fantom (player 1)
     """
+    num: int
 
-    def __init__(self, n):
+    def __init__(self, n: int):
         self.num = n
-        self.role = "inspector" if n == 0 else "fantom"
+        # Todo: Should not be a str, enum instead.
+        self.role: str = "inspector" if n == 0 else "fantom"
 
     def play(self, game):
         logger.info("--\n" + self.role + " plays\n--")
@@ -95,12 +97,16 @@ class Player:
 
                 # red character
                 if charact.color == "red":
+                    # Todo: 2.Origin Should be replaced by
+                    #  draw = random.choice(game.cards)
+                    #  game.cards.remove(draw)
                     draw = game.cards[0]
                     logger.info(str(draw) + " was drawn")
                     if draw == "fantom":
                         game.position_carlotta += -1 if self.num == 0 else 1
                     elif self.num == 0:
                         draw.suspect = False
+                    # Todo: 2 Should be removed
                     del game.cards[0]
 
                 # black character

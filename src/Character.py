@@ -1,10 +1,20 @@
+from typing import Dict, Union
+
+
 class Character:
     """
         Class representing the eight possible characters of the game.
     """
+    color: str
+    suspect: bool
+    position: int
+    power: bool
 
-    def __init__(self, color):
-        self.color, self.suspect, self.position, self.power = color, True, 0, True
+    def __init__(self, color: str):
+        self.color = color
+        self.suspect = True
+        self.position = 0
+        self.power = True
 
     def __repr__(self):
         if self.suspect:
@@ -13,7 +23,7 @@ class Character:
             susp = "-clean"
         return self.color + "-" + str(self.position) + susp
 
-    def display(self):
+    def display(self)-> Dict[str, Union[bool, int, str]]:
         return {
             "color": self.color,
             "suspect": self.suspect,
