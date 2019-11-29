@@ -21,7 +21,7 @@ class Game:
     characters: Set[Character]
     character_cards: List[Character]
     active_cards: List[Character]
-    cards: List[Union[Character, str]]
+    alibi_cards: List[Union[Character, str]]
     fantom: Character
 
     # Todo: def __init__ should be __init__(self, player_1: Player, player_2:
@@ -73,9 +73,8 @@ class Game:
 
         for character in self.characters:
             # get position of grey character
-            if character.display()["color"] == "grey":
-                grey_character_position = character.display()["position"]
-                self.shadow = grey_character_position
+            if character.color == "grey":
+                self.shadow = character.position
 
         self.characters_display = [character.display() for character in
                                    self.characters]
