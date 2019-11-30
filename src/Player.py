@@ -1,7 +1,7 @@
 import json
 from random import randint, choice
 
-from src.globals import passages, colors, pink_passages, before, two, after, logger
+from src.globals import passages, colors, pink_passages, before, two, after
 from src.utils import ask_question_json
 
 
@@ -18,9 +18,7 @@ class Player:
         self.role: str = "inspector" if n == 0 else "fantom"
 
     def play(self, game):
-        logger.info("--\n" + self.role + " plays\n--")
 
-        logger.debug(json.dumps(game.update_game_state(""), indent=4))
         charact = self.select(game.active_cards,
                               game.update_game_state(self.role))
 
@@ -57,14 +55,10 @@ class Player:
                 ' !  : selected character not in '
                 'available characters. Choosing random character.'
             )
-            logger.warning(warning_message)
             selected_character = randint(0, len(t) - 1)
 
         perso = t[selected_character]
 
-        # log
-        logger.info(f"question : {question['question type']}")
-        logger.info(f"answer : {perso}")
 
         del t[selected_character]
         return perso
@@ -83,23 +77,14 @@ class Player:
             power_activation = ask_question_json(self, question)
 
             # log
-            logger.info(f"question : {question['question type']}")
-            if power_activation == 1:
-                power_answer = "yes"
-            else:
-                power_answer = "no"
-            logger.info("answer  : " + power_answer)
-
             # work
             if power_activation:
-                logger.info(charact.color + " power activated")
                 charact.power = False
 
                 # red character
                 if charact.color == "red":
                     draw = choice(game.alibi_cards)
                     game.alibi_cards.remove(draw)
-                    logger.info(str(draw) + " was drawn")
                     if draw == "fantom":
                         game.position_carlotta += -1 if self.num == 0 else 1
                     elif self.num == 0:
@@ -111,7 +96,6 @@ class Player:
                         if q.position in {x for x in passages[charact.position] if
                                           x not in game.blocked or q.position not in game.blocked}:
                             q.position = charact.position
-                            logger.info("new position : " + str(q))
 
                 # white character
                 if charact.color == "white":
@@ -137,18 +121,12 @@ class Player:
                                     ' !  : selected position not available '
                                     'Choosing random position.'
                                 )
-                                logger.warning(warning_message)
                                 selected_position = disp.pop()
 
                             else:
                                 selected_position = available_positions[selected_index]
 
-                            logger.info(
-                                f"question : {question['question type']}")
-                            logger.info("answer : " +
-                                        str(selected_position))
                             moved_character.position = selected_position
-                            logger.info("new position : " + str(moved_character))
 
                 # purple character
                 if charact.color == "purple":
@@ -167,21 +145,16 @@ class Player:
                             ' !  : selected character not available '
                             'Choosing random character.'
                         )
-                        logger.warning(warning_message)
                         selected_character = colors.pop()
 
                     else:
                         selected_character = available_characters[selected_index]
 
-                    logger.info(f"question : {question['question type']}")
-                    logger.info("answer : " + selected_character)
 
                     # y a pas plus simple ?
                     selected_crctr = [x for x in game.characters if x.color
                                       == selected_character][0]
                     charact.position, selected_crctr.position = selected_crctr.position, charact.position
-                    logger.info("new position : " + str(charact))
-                    logger.info("new position : " + str(selected_crctr))
 
                 # brown character
                 if charact.color == "brown":
@@ -204,7 +177,6 @@ class Player:
                             ' !  : selected room not available '
                             'Choosing random room.'
                         )
-                        logger.warning(warning_message)
                         selected_index = randint(
                             0, len(available_rooms) - 1)
                         selected_room = available_rooms[selected_index]
@@ -213,8 +185,6 @@ class Player:
                         selected_room = available_rooms[selected_index]
 
                     game.shadow = selected_room
-                    logger.info(f"question : {question['question type']}")
-                    logger.info("answer : " + str(game.shadow))
 
                 # blue character
                 if charact.color == "blue":
@@ -232,7 +202,6 @@ class Player:
                             ' !  : selected room not available '
                             'Choosing random room.'
                         )
-                        logger.warning(warning_message)
                         selected_index = randint(
                             0, len(available_rooms) - 1)
                         selected_room = available_rooms[selected_index]
@@ -254,15 +223,11 @@ class Player:
                             ' !  : selected exit not available '
                             'Choosing random exit.'
                         )
-                        logger.warning(warning_message)
                         selected_exit = passages_work.pop()
 
                     else:
                         selected_exit = available_exits[selected_index]
 
-                    logger.info(f"question : {question['question type']}")
-                    logger.info("answer : " +
-                                str({selected_room, selected_exit}))
                     game.blocked = tuple((selected_room, selected_exit))
         return [charact]
 
@@ -287,17 +252,11 @@ class Player:
                     ' !  : selected position not available '
                     'Choosing random position.'
                 )
-                logger.warning(warning_message)
                 selected_position = disp.pop()
 
             else:
                 selected_position = available_positions[selected_index]
 
-            logger.info(f"question : {question['question type']}")
-            logger.info("answer : " + str(selected_position))
 
-            if len(moved_characters) > 1:
-                logger.debug("more than one character moves")
             for q in moved_characters:
                 q.position = selected_position
-                logger.info("new position : " + str(q))

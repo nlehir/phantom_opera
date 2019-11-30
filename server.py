@@ -1,10 +1,11 @@
 import cProfile
+import os
 import sys
 from threading import Thread
 
 from src.Game import Game
 from src.Player import Player
-from src.globals import logger, clients, link
+from src.globals import clients, link
 import random_fantom
 import random_inspector
 
@@ -15,36 +16,39 @@ import random_inspector
 """
 
 
-def init_connexion():
-    while len(clients) != 2:
-        link.listen(2)
-        (clientsocket, addr) = link.accept()
-        logger.info("Received client !")
-        clients.append(clientsocket)
-        clientsocket.settimeout(500)
-    game = Game(players)
-    game.lancer()
-    link.close()
+class InitConnexion(Thread):
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        while len(clients) != 2:
+            link.listen(2)
+            (clientsocket, addr) = link.accept()
+            clients.append(clientsocket)
+            clientsocket.settimeout(500)
+        game = Game(players)
+        game.lancer()
+        link.close()
+        print('end')
 
 
 if __name__ == '__main__':
     players = [Player(0), Player(1)]
     scores = []
 
-    logger.info("no client yet")
-    game = Thread(target=init_connexion)
+    game = InitConnexion()
+    print('start')
     game.start()
     rfantom = random_fantom.Player()
     rfantom.start()
     rinspector = random_inspector.Player()
     rinspector.start()
-    game.join()
     rfantom.join()
     rinspector.join()
+    game.join()
 
     # init_connexion()
-    logger.info("received all clients")
-
+    print('the game is finished')
     # profiling
     pr = cProfile.Profile()
     pr.enable()
@@ -54,6 +58,5 @@ if __name__ == '__main__':
     # stats_file = open("{}.txt".format(os.path.basename(__file__)), 'w')
     stats_file = open("./logs/profiling.txt", 'w')
     sys.stdout = stats_file
-    pr.print_stats(sort='time')
 
     sys.stdout = sys.__stdout__

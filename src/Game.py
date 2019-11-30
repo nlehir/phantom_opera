@@ -4,7 +4,8 @@ from typing import List, Set, Union, Tuple
 
 from src.Character import Character
 from src.Player import Player
-from src.globals import logger, passages, colors
+from src.globals import passages, colors
+from src.utils import send_json_to_player
 
 
 class Game:
@@ -47,16 +48,11 @@ class Game:
         self.alibi_cards = self.character_cards.copy()
         self.fantom = choice(self.alibi_cards)
         # Todo: Should be placed in a logger section of the __init__()
-        logger.info("the fantom is " + self.fantom.color)
         self.alibi_cards.remove(self.fantom)
         self.alibi_cards.extend(['fantom'] * 3)
 
         # log
-        logger.info("\n=======\nnew game\n=======")
         # Todo: 1 Should be removed
-        logger.info(f"shuffle {len(self.character_cards)} character_cards")
-        # Todo: 2 Should be removed
-        logger.info(f"shuffle {len(self.alibi_cards)} alibi cards")
         # work
         # Todo: 1 Should be removed
         shuffle(self.character_cards)
@@ -109,7 +105,6 @@ class Game:
         """
         first_player_in_phase = (self.num_tour + 1) % 2
         if first_player_in_phase == 0:
-            logger.info(f"-\nshuffle {len(self.character_cards)} character_cards\n-")
             shuffle(self.character_cards)
             self.active_cards = self.character_cards[:4]
         else:
@@ -123,14 +118,12 @@ class Game:
             {p for p in self.characters if p.position == i} for i in range(10)]
         if len(partition[self.fantom.position]) == 1 \
                 or self.fantom.position == self.shadow:
-            logger.info("The fantom screams.")
             self.position_carlotta += 1
             for room, chars in enumerate(partition):
                 if len(chars) > 1 and room != self.shadow:
                     for p in chars:
                         p.suspect = False
         else:
-            logger.info("the fantom does not scream.")
             for room, chars in enumerate(partition):
                 if len(chars) == 1 or room == self.shadow:
                     for p in chars:
@@ -139,11 +132,6 @@ class Game:
             [p for p in self.characters if p.suspect])
 
     def tour(self):
-        # log
-        logger.info("\n------------------")
-        logger.info(self)
-        logger.debug(json.dumps(self.update_game_state(""), indent=4))
-
         # work
         self.actions()
         self.fantom_scream()
@@ -161,18 +149,8 @@ class Game:
                 [p for p in self.characters if p.suspect]) > 1:
             self.tour()
         # game ends
-        if self.position_carlotta < self.exit:
-            logger.info(
-                "----------\n---- inspector wins : fantom is " + str(
-                    self.fantom))
-        else:
-            logger.info("----------\n---- fantom wins")
-        # log
-        logger.info(
-            f"---- final position of Carlotta : {self.position_carlotta}")
-        logger.info(f"---- exit : {self.exit}")
-        logger.info(
-            f"---- final score : {self.exit - self.position_carlotta}\n----------")
+        send_json_to_player(self.players[0].num, data={'question type': 'END'})
+        send_json_to_player(self.players[1].num, data={'question type': 'END'})
         return self.exit - self.position_carlotta
 
     def __repr__(self):

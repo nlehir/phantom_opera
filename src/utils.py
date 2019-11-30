@@ -1,7 +1,7 @@
 import json
 
 import protocol
-from src.globals import logger, clients
+from src.globals import clients
 
 """
     Functions handling exchanges between
@@ -18,7 +18,6 @@ def receive_json_from_player(player):
         inspector.
         :return: return a python-readable object.
     """
-    logger.debug(f"receive json from player {player}")
     received_bytes = protocol.receive_json(clients[player])
     json_object = json.loads(received_bytes)
     return json_object
@@ -32,7 +31,6 @@ def send_json_to_player(player, data):
         inspector.
         :param data: python object sent to the player.
     """
-    logger.debug(f"send json to player {player}")
     msg = json.dumps(data).encode("utf-8")
     protocol.send_json(clients[player], msg)
 

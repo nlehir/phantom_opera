@@ -28,10 +28,13 @@ class Player(Thread):
 
     def handle_json(self, data):
         data = json.loads(data)
+        if data['question type'] == 'END':
+            return 1
         response = self.answer(data)
         # send back to server
         bytes_data = json.dumps(response).encode("utf-8")
         protocol.send_json(self.socket, bytes_data)
+        return 0
 
     def run(self):
 
@@ -40,7 +43,8 @@ class Player(Thread):
         while self.end is not True:
             received_message = protocol.receive_json(self.socket)
             if received_message:
-                self.handle_json(received_message)
+                if self.handle_json(received_message) == 1:
+                    self.end = True
             else:
                 print("no message, finished learning")
                 self.end = True
