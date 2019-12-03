@@ -73,7 +73,7 @@ class Game:
 
         for character in self.characters:
             # get position of grey character
-            if character.display()["color"] == "grey":
+            if character.color == "grey":
                 grey_character_position = character.display()["position"]
                 self.shadow = grey_character_position
 

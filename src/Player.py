@@ -25,6 +25,7 @@ class Player:
         charact = self.select(game.active_cards,
                               game.update_game_state(self.role))
 
+        # __import__('ipdb').set_trace()
         moved_characters = self.activate_power(charact,
                                                game,
                                                before | both,
