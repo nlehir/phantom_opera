@@ -2,7 +2,7 @@ import json
 import random
 from typing import Tuple
 
-from src.globals import passages, colors, pink_passages, before, two, after, logger
+from src.globals import passages, colors, pink_passages, before, both, after, logger
 from src.utils import ask_question_json
 
 
@@ -27,7 +27,7 @@ class Player:
 
         moved_characters = self.activate_power(charact,
                                                game,
-                                               before | two,
+                                               before | both,
                                                game.update_game_state(self.role))
 
         self.move(charact,
@@ -37,7 +37,7 @@ class Player:
 
         self.activate_power(charact,
                             game,
-                            after | two,
+                            after | both,
                             game.update_game_state(self.role))
 
     def select(self, t, game_state):
