@@ -41,7 +41,6 @@ class Player:
 
             # now play red character
             if power_activation_time=="before":
-                print("play red before")
                 moved_characters = self.activate_power(charact,
                                                        game,
                                                        before | both,
@@ -52,7 +51,6 @@ class Player:
                           game.blocked,
                           game.update_game_state(self.role))
             else:
-                print("play red after")
                 self.move(charact,
                           [charact],
                           game.blocked,
