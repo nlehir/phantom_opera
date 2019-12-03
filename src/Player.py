@@ -25,21 +25,61 @@ class Player:
         charact = self.select(game.active_cards,
                               game.update_game_state(self.role))
 
-        # __import__('ipdb').set_trace()
-        moved_characters = self.activate_power(charact,
-                                               game,
-                                               before | both,
-                                               game.update_game_state(self.role))
+        # red character can choose to activate its power
+        # before OR after moving
+        if charact.color == "red":
+            activation_possibilities = ["before", "after"]
+            question = {"question type": "red character power activation time",
+                        "data": activation_possibilities,
+                        "game state": game.update_game_state(self.role)}
 
-        self.move(charact,
-                  moved_characters,
-                  game.blocked,
-                  game.update_game_state(self.role))
+            power_activation_time = ask_question_json(self, question)
+            if power_activation_time not in [0, 1]:
+                power_activation_time = random.choice(activation_possibilities)
+            else:
+                power_activation_time = activation_possibilities[power_activation_time]
 
-        self.activate_power(charact,
-                            game,
-                            after | both,
-                            game.update_game_state(self.role))
+            # now play red character
+            if power_activation_time=="before":
+                print("play red before")
+                moved_characters = self.activate_power(charact,
+                                                       game,
+                                                       before | both,
+                                                       game.update_game_state(self.role))
+
+                self.move(charact,
+                          [charact],
+                          game.blocked,
+                          game.update_game_state(self.role))
+            else:
+                print("play red after")
+                self.move(charact,
+                          [charact],
+                          game.blocked,
+                          game.update_game_state(self.role))
+
+                self.activate_power(charact,
+                                    game,
+                                    after | both,
+                                    game.update_game_state(self.role))
+
+
+        # character is not red
+        else:
+            moved_characters = self.activate_power(charact,
+                                                   game,
+                                                   before | both,
+                                                   game.update_game_state(self.role))
+
+            self.move(charact,
+                      moved_characters,
+                      game.blocked,
+                      game.update_game_state(self.role))
+
+            self.activate_power(charact,
+                                game,
+                                after | both,
+                                game.update_game_state(self.role))
 
     def select(self, t, game_state):
         """
@@ -150,7 +190,8 @@ class Player:
                             logger.info("answer : " +
                                         str(selected_position))
                             moved_character.position = selected_position
-                            logger.info("new position : " + str(moved_character))
+                            logger.info("new position : " +
+                                        str(moved_character))
 
                 # purple character
                 if charact.color == "purple":
