@@ -19,10 +19,14 @@ clients = []
 """
 # determines whether the power of the character is used before
 # or after moving
-permanents, two, before, after = {'pink'}, {
-    'red', 'grey', 'blue'}, {'purple', 'brown'}, {'black', 'white'}
+permanents = {"pink"}
+both = {'red', 'grey', 'blue'}
+before = {'purple', 'brown'}
+after = {'black', 'white'}
+
 # reunion of sets
-colors = before | permanents | after | two
+colors = before | permanents | after | both
+
 # ways between rooms
 passages = [{1, 4}, {0, 2}, {1, 3}, {2, 7}, {0, 5, 8},
             {4, 6}, {5, 7}, {3, 6, 9}, {4, 9}, {7, 8}]

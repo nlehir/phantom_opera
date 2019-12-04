@@ -1,7 +1,8 @@
 import json
 import random
+from typing import Tuple
 
-from src.globals import passages, colors, pink_passages, before, two, after, logger
+from src.globals import passages, colors, pink_passages, before, both, after, logger
 from src.utils import ask_question_json
 
 
@@ -21,23 +22,62 @@ class Player:
         logger.info("--\n" + self.role + " plays\n--")
 
         logger.debug(json.dumps(game.update_game_state(""), indent=4))
-        charact = self.select(game.active_tiles,
+        charact = self.select(game.active_cards,
                               game.update_game_state(self.role))
 
-        moved_characters = self.activate_power(charact,
-                                               game,
-                                               before | two,
-                                               game.update_game_state(self.role))
+        # red character can choose to activate its power
+        # before OR after moving
+        if charact.color == "red":
+            activation_possibilities = ["before", "after"]
+            question = {"question type": "red character power activation time",
+                        "data": activation_possibilities,
+                        "game state": game.update_game_state(self.role)}
 
-        self.move(charact,
-                  moved_characters,
-                  game.blocked,
-                  game.update_game_state(self.role))
+            power_activation_time = ask_question_json(self, question)
+            if power_activation_time not in [0, 1]:
+                power_activation_time = random.choice(activation_possibilities)
+            else:
+                power_activation_time = activation_possibilities[power_activation_time]
 
-        self.activate_power(charact,
-                            game,
-                            after | two,
-                            game.update_game_state(self.role))
+            # now play red character
+            if power_activation_time=="before":
+                moved_characters = self.activate_power(charact,
+                                                       game,
+                                                       before | both,
+                                                       game.update_game_state(self.role))
+
+                self.move(charact,
+                          [charact],
+                          game.blocked,
+                          game.update_game_state(self.role))
+            else:
+                self.move(charact,
+                          [charact],
+                          game.blocked,
+                          game.update_game_state(self.role))
+
+                self.activate_power(charact,
+                                    game,
+                                    after | both,
+                                    game.update_game_state(self.role))
+
+
+        # character is not red
+        else:
+            moved_characters = self.activate_power(charact,
+                                                   game,
+                                                   before | both,
+                                                   game.update_game_state(self.role))
+
+            self.move(charact,
+                      moved_characters,
+                      game.blocked,
+                      game.update_game_state(self.role))
+
+            self.activate_power(charact,
+                                game,
+                                after | both,
+                                game.update_game_state(self.role))
 
     def select(self, t, game_state):
         """
@@ -97,17 +137,13 @@ class Player:
 
                 # red character
                 if charact.color == "red":
-                    # Todo: 2.Origin Should be replaced by
-                    #  draw = random.choice(game.cards)
-                    #  game.cards.remove(draw)
-                    draw = game.cards[0]
+                    draw = random.choice(game.alibi_cards)
+                    game.alibi_cards.remove(draw)
                     logger.info(str(draw) + " was drawn")
                     if draw == "fantom":
                         game.position_carlotta += -1 if self.num == 0 else 1
                     elif self.num == 0:
                         draw.suspect = False
-                    # Todo: 2 Should be removed
-                    del game.cards[0]
 
                 # black character
                 if charact.color == "black":
@@ -152,7 +188,8 @@ class Player:
                             logger.info("answer : " +
                                         str(selected_position))
                             moved_character.position = selected_position
-                            logger.info("new position : " + str(moved_character))
+                            logger.info("new position : " +
+                                        str(moved_character))
 
                 # purple character
                 if charact.color == "purple":
@@ -267,8 +304,7 @@ class Player:
                     logger.info(f"question : {question['question type']}")
                     logger.info("answer : " +
                                 str({selected_room, selected_exit}))
-                    game.blocked = {selected_room, selected_exit}
-                    game.blocked_list = list(game.blocked)
+                    game.blocked = tuple((selected_room, selected_exit))
         return [charact]
 
     def move(self, charact, moved_characters, blocked, game_state):
