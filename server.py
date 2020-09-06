@@ -1,6 +1,7 @@
 import cProfile
 import sys
 from logging import Logger
+from socket import socket
 from threading import Thread
 
 from src.game.PlayerType import PlayerType
@@ -40,19 +41,22 @@ def matchmaking(logger: Logger):
         glob.roomThreads[room.uuid] = roomthread
 
 
-def run(logger: Logger):
+def handle_connections(logger: Logger):
     glob.sock.listen(5)
-    while glob.server_running:
-        (clientsocket, addr) = glob.sock.accept()
-        logger.info("New client has logged on !")
-        glob.current_thread_id += 1
-        client = Client(clientsocket, glob.current_thread_id, logger)
-        glob.waiting_clients.append(client)
-        clientsocket.settimeout(500)
-        clientthread = Thread(target=client.handle_messages)
-        clientthread.start()
-        glob.clientThreads[glob.current_thread_id] = clientthread
-        matchmaking(logger)
+    try:
+        while glob.server_running:
+            (clientsocket, addr) = glob.sock.accept()
+            logger.info("New client has logged on !")
+            glob.current_thread_id += 1
+            client = Client(clientsocket, glob.current_thread_id, logger)
+            glob.waiting_clients.append(client)
+            clientsocket.settimeout(500)
+            clientthread = Thread(target=client.handle_messages)
+            clientthread.start()
+            glob.clientThreads[glob.current_thread_id] = clientthread
+            matchmaking(logger)
+    except OSError:
+        logger.info("Closing the network")
 
 
 if __name__ == '__main__':
@@ -60,13 +64,20 @@ if __name__ == '__main__':
     _logger = glob.create_main_logger()
     _logger.info("Launching server ...")
 
-    run(_logger)
+    handlerThread = Thread(target=handle_connections, args=(_logger,))
+    handlerThread.start()
+
+    while glob.server_running:
+        command = input()
+        if command == "quit":
+            _logger.info("Server shutdown !")
+            glob.server_running = False
+            glob.sock.close()
 
     for ctKey in glob.clientThreads:
         glob.clientThreads[ctKey].join()
     for roomKey in glob.roomThreads:
         glob.roomThreads[roomKey].join()
-
-    glob.sock.close()
+    handlerThread.join()
 
     sys.stdout = sys.__stdout__
