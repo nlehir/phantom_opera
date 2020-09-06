@@ -9,9 +9,9 @@ from src.network import Protocol
 
 heroku = True
 if heroku:
-    hostname = "http://phantom-opera-server.herokuapp.com"
+    hostname = "phantom-opera-server.herokuapp.com"
     host = socket.gethostbyname(hostname)
-    port = 80
+    port = 443
 else:
     host = "localhost"
     port = 12000

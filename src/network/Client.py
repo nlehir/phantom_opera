@@ -1,6 +1,7 @@
+import errno
 import time
 from logging import Logger
-from socket import socket
+import socket
 
 from src.game.PlayerType import PlayerType
 from src.network import Protocol
@@ -41,18 +42,31 @@ class Client:
             if self.isAuthenticated:
                 time.sleep(5)
             elif not self.isAuthenticated:
-                self.logger.info("Waiting for authentication of user : " + str(self.threadId))
-                msg = Protocol.receive_string(self.sock)
-                if msg == "inspector connection":
-                    self.isAuthenticated = True
-                    self.playerType = PlayerType.INSPECTOR
-                if msg == "fantom connection":
-                    self.isAuthenticated = True
-                    self.playerType = PlayerType.FANTOM
-                if self.isAuthenticated:
-                    Protocol.send_string(self.sock, "connection accepted")
-                    self.logger.info(str(self.threadId) + ": Authentication accepted, Welcome !")
-                else:
-                    Protocol.send_string(self.sock, "connection refused")
-                    self.logger.info(str(self.threadId) + ": Authentication refused, Sorry !")
+                try:
+                    self.logger.info("Waiting for authentication of user : " + str(self.threadId))
+                    msg = Protocol.receive_string(self.sock)
+                    if msg == "inspector connection":
+                        self.isAuthenticated = True
+                        self.playerType = PlayerType.INSPECTOR
+                    if msg == "fantom connection":
+                        self.isAuthenticated = True
+                        self.playerType = PlayerType.FANTOM
+                    if self.isAuthenticated:
+                        Protocol.send_string(self.sock, "connection accepted")
+                        self.logger.info(str(self.threadId) + ": Authentication accepted, Welcome !")
+                    else:
+                        Protocol.send_string(self.sock, "connection refused")
+                        self.logger.info(str(self.threadId) + ": Authentication refused, Sorry !")
+                        self.disconnect()
+                except socket.error as e:
+                    if isinstance(e.args, tuple):
+                        self.logger.error("errno is %d" % e[0])
+                        if e[0] == errno.EPIPE:
+                            # remote peer disconnected
+                            self.logger.error("Detected remote disconnect")
+                        else:
+                            # determine and handle different error
+                            pass
+                    else:
+                        self.logger.error("socket error ", e)
                     self.disconnect()
