@@ -35,6 +35,8 @@ class RoomServer:
     def run(self):
         self.logger.info("Room opened, initializing data for the game")
 
+        self.roomClients[0].isPlaying = True
+        self.roomClients[1].isPlaying = True
         clients[self.uuid] = []
         clients[self.uuid].append(self.roomClients[0])
         clients[self.uuid].append(self.roomClients[1])

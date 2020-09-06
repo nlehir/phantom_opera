@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import os
 import socket
@@ -6,7 +8,9 @@ from threading import Thread
 from typing import List, Dict
 from uuid import UUID
 
-from src.network.Client import Client
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.network.Client import Client
 
 """
     server setup
@@ -88,3 +92,6 @@ def create_main_logger():
     logger.addHandler(stream_handler)
     return logger
 
+
+def remove_waiting_client(client: Client):
+    waiting_clients.remove(client)

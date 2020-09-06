@@ -4,12 +4,14 @@ from socket import socket
 
 from src.game.PlayerType import PlayerType
 from src.network import Protocol
+from src.utils.globals import remove_waiting_client
 
 
 class Client:
     sock: socket
     isConnected: bool
     isAuthenticated: bool
+    isPlaying: bool
     playerType: PlayerType
     threadId: int
     logger: Logger
@@ -19,12 +21,15 @@ class Client:
         self.threadId = threadId
         self.isConnected = True
         self.isAuthenticated = False
+        self.isPlaying = False
         self.logger = logger
         self.playerType = PlayerType.UNDEFINED
 
     def disconnect(self):
         self.isConnected = False
         self.sock.close()
+        if not self.isPlaying:
+            remove_waiting_client(self)
 
     def handle_messages(self):
         """
