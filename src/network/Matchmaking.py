@@ -10,9 +10,9 @@ from src.network.RoomServer import RoomServer
 def matchmaking(logger: Logger):
     """
         Try to match 2 clients to launch a room for those clients
-        For the moment matchmaking is triggered once for each client authenticated
-        No need to run it on a dedicated thread each x minutes because disconnections while in queue
-        Should be quit rare
+
+        Runs every 2 sec if there are more than 2 clients in the queue
+        Need some improvements to make the waiting time more dynamic for huge loads
     """
 
     while glob.server_running:
