@@ -10,8 +10,10 @@ from src.network import Protocol
 heroku = True
 if heroku:
     hostname = "phantom-opera-server.herokuapp.com"
+    print("Trying to get hostname", flush=True)
     host = socket.gethostbyname(hostname)
-    port = 443
+    print("Got a hostname: " + str(host), flush=True)
+    port = 80
 else:
     host = "localhost"
     port = 12000
@@ -73,8 +75,11 @@ class Player():
         Protocol.send(self.socket, bytes_data)
 
     def authenticate(self):
+        print("Trying to authenticate", flush=True)
         Protocol.send_string(self.socket, "fantom connection")
+        print("Asked for authentication", flush=True)
         auth_resp = Protocol.receive_string(self.socket)
+        print("Received response : " + auth_resp, flush=True)
 
         if not auth_resp == "connection accepted":
             self.reset()
@@ -82,7 +87,9 @@ class Player():
         return True
 
     def run(self):
+        print("Trying to connect")
         self.connect()
+        print("Connected")
 
         if not self.authenticate():
             return

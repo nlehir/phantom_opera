@@ -11,7 +11,7 @@ heroku = True
 if heroku:
     hostname = "phantom-opera-server.herokuapp.com"
     host = socket.gethostbyname(hostname)
-    port = 443
+    port = 80
 else:
     host = "localhost"
     port = 12000
