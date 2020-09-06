@@ -18,10 +18,12 @@ port = 12000
 sock.bind((host, port))
 # list that will later contain the sockets
 waiting_clients: List[Client] = []
-clients: Dict[int, Client] = {}
+# Dico of clients to retreive them if needed, in the future this will disapear only the room server should decide
+# what to do with its client list no need for a global here
+clients: Dict[UUID, List[Client]] = {}
 server_running: bool = True
 current_thread_id = -1
-clientThreads: Dict[UUID, Thread] = {}
+clientThreads: Dict[int, Thread] = {}
 roomThreads: Dict[UUID, Thread] = {}
 
 """

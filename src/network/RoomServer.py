@@ -8,7 +8,7 @@ from typing import List
 from src.game.Game import Game
 from src.game.Player import Player
 from src.network.Client import Client
-from src.utils.globals import create_logger
+from src.utils.globals import create_logger, clients
 
 """
     Initialize the data before launching a game
@@ -34,8 +34,12 @@ class RoomServer:
     def run(self):
         self.logger.info("Room opened, initializing data for the game")
 
+        clients[self.uuid].append(self.roomClients[0])
+        clients[self.uuid].append(self.roomClients[1])
+
         # Player 0 is always a Inspector and 1 is Fantom : order handled by matchmaking
-        players = [Player(0, self.uuid, self.logger), Player(1, self.uuid, self.logger)]
+        players = [Player(0, self.roomClients[0], self.uuid, self.logger),
+                   Player(1, self.roomClients[1], self.uuid, self.logger)]
         scores = []
 
         # profiling

@@ -3,7 +3,7 @@ import random
 from logging import Logger
 from uuid import UUID
 
-
+from src.network.Client import Client
 from src.utils.globals import passages, colors, pink_passages, before, both, after
 from src.utils.utils import ask_question_json
 
@@ -14,12 +14,14 @@ class Player:
         or the fantom (player 1)
     """
     id: int
+    client: Client
     uuid: UUID
 
-    def __init__(self, n: int, _uuid: UUID, logger: Logger):
+    def __init__(self, n: int, client: Client, uuid: UUID, logger: Logger):
         self.id = n
-        self.uuid = _uuid
+        self.client = client
         self.logger = logger
+        self.uuid = uuid
 
         # Todo: Should not be a str, enum instead.
         self.role: str = "inspector" if n == 0 else "fantom"
@@ -39,7 +41,7 @@ class Player:
                         "data": activation_possibilities,
                         "game state": game.update_game_state(self.role)}
 
-            power_activation_time = ask_question_json(self.uuid, self, question)
+            power_activation_time = ask_question_json(self.client, self.uuid, question)
             if power_activation_time not in [0, 1]:
                 power_activation_time = random.choice(activation_possibilities)
             else:
@@ -94,7 +96,7 @@ class Player:
         question = {"question type": "select character",
                     "data": available_characters,
                     "game state": game_state}
-        selected_character = ask_question_json(self.uuid, self, question)
+        selected_character = ask_question_json(self.client, self.uuid, question)
 
         # test
         # range(len(t)) goes until len(t)-1
@@ -126,7 +128,7 @@ class Player:
             question = {"question type": f"activate {character_color} power",
                         "data": [0, 1],
                         "game state": game_state}
-            power_activation = ask_question_json(self.uuid, self, question)
+            power_activation = ask_question_json(self.client, self.uuid, question)
 
             # log
             self.logger.info(f"question : {question['question type']}")
@@ -175,7 +177,7 @@ class Player:
                             question = {"question type": "white character power move " + character_to_move,
                                         "data": available_positions,
                                         "game state": game_state}
-                            selected_index = ask_question_json(self.uuid, self, question)
+                            selected_index = ask_question_json(self.client, self.uuid, question)
 
                             # test
                             if selected_index not in range(len(disp)):
@@ -206,7 +208,7 @@ class Player:
                     question = {"question type": "purple character power",
                                 "data": available_characters,
                                 "game state": game_state}
-                    selected_index = ask_question_json(self.uuid, self, question)
+                    selected_index = ask_question_json(self.client, self.uuid, question)
 
                     # test
                     if selected_index not in range(len(colors)):
@@ -243,7 +245,7 @@ class Player:
                     question = {"question type": "grey character power",
                                 "data": available_rooms,
                                 "game state": game_state}
-                    selected_index = ask_question_json(self.uuid, self, question)
+                    selected_index = ask_question_json(self.client, self.uuid, question)
 
                     # test
                     if selected_index not in range(len(available_rooms)):
@@ -271,7 +273,7 @@ class Player:
                     question = {"question type": "blue character power room",
                                 "data": available_rooms,
                                 "game state": game_state}
-                    selected_index = ask_question_json(self.uuid, self, question)
+                    selected_index = ask_question_json(self.client, self.uuid, question)
 
                     # test
                     if selected_index not in range(len(available_rooms)):
@@ -293,7 +295,7 @@ class Player:
                     question = {"question type": "blue character power exit",
                                 "data": available_exits,
                                 "game state": game_state}
-                    selected_index = ask_question_json(self.uuid, self, question)
+                    selected_index = ask_question_json(self.client, self.uuid, question)
 
                     # test
                     if selected_index not in range(len(available_exits)):
@@ -326,7 +328,7 @@ class Player:
             question = {"question type": "select position",
                         "data": available_positions,
                         "game state": game_state}
-            selected_index = ask_question_json(self.uuid, self, question)
+            selected_index = ask_question_json(self.client, self.uuid, question)
 
             # test
             if selected_index not in range(len(disp)):
