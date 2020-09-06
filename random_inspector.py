@@ -5,7 +5,7 @@ import random
 import socket
 from logging.handlers import RotatingFileHandler
 
-import protocol
+from src.network import Protocol
 
 host = "localhost"
 port = 12000
@@ -65,14 +65,14 @@ class Player():
         response = self.answer(data)
         # send back to server
         bytes_data = json.dumps(response).encode("utf-8")
-        protocol.send_json(self.socket, bytes_data)
+        Protocol.send_json(self.socket, bytes_data)
 
     def run(self):
 
         self.connect()
 
         while self.end is not True:
-            received_message = protocol.receive_json(self.socket)
+            received_message = Protocol.receive_json(self.socket)
             if received_message:
                 self.handle_json(received_message)
             else:
