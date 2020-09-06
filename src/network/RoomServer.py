@@ -34,6 +34,7 @@ class RoomServer:
     def run(self):
         self.logger.info("Room opened, initializing data for the game")
 
+        clients[self.uuid] = []
         clients[self.uuid].append(self.roomClients[0])
         clients[self.uuid].append(self.roomClients[1])
 
@@ -51,10 +52,13 @@ class RoomServer:
         game = Game(players, self.roomClients, self.logger)
         game.start()
 
+        self.roomClients[0].disconnect()
+        self.roomClients[1].disconnect()
+
         # profiling
         pr.disable()
         # stats_file = open("{}.txt".format(os.path.basename(__file__)), 'w')
-        stats_file = open("./logs/profiling" + str(uuid) + ".txt", 'w')
+        stats_file = open("./logs/profiling_" + str(self.uuid) + ".txt", 'w')
         sys.stdout = stats_file
         pr.print_stats(sort='time')
         self.close_logger()

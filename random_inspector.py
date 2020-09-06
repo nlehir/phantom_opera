@@ -65,14 +65,25 @@ class Player():
         response = self.answer(data)
         # send back to server
         bytes_data = json.dumps(response).encode("utf-8")
-        Protocol.send_json(self.socket, bytes_data)
+        Protocol.send(self.socket, bytes_data)
+
+    def authenticate(self):
+        Protocol.send_string(self.socket, "inspector connection")
+        auth_resp = Protocol.receive_string(self.socket)
+
+        if not auth_resp == "connection accepted":
+            self.reset()
+            return False
+        return True
 
     def run(self):
-
         self.connect()
 
+        if not self.authenticate():
+            return
+
         while self.end is not True:
-            received_message = Protocol.receive_json(self.socket)
+            received_message = Protocol.receive(self.socket)
             if received_message:
                 self.handle_json(received_message)
             else:

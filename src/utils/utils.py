@@ -23,9 +23,23 @@ def receive_json_from_player(client: Client, uuid: UUID):
         :return: return a python-readable object.
     """
     # logger.debug(f"receive json from player {player}")
-    received_bytes = Protocol.receive_json(client.sock)
+    received_bytes = Protocol.receive(client.sock)
     if len(received_bytes) == 0:
         terminate_game(clients[uuid], uuid)
+    json_object = json.loads(received_bytes)
+    return json_object
+
+
+def receive_json_from_client(client: Client):
+    """
+        Receives a python object from the client and converts it to a python
+        object.
+    """
+    received_bytes = Protocol.receive(client.sock)
+    if len(received_bytes) == 0:
+        client.disconnect()
+        clientThreads[client.threadId].join()
+        clientThreads.pop(client.threadId)
     json_object = json.loads(received_bytes)
     return json_object
 
@@ -40,7 +54,7 @@ def send_json_to_player(client: Client, data):
     """
     # logger.debug(f"send json to player {player}")
     msg = json.dumps(data).encode("utf-8")
-    Protocol.send_json(client.sock, msg)
+    Protocol.send(client.sock, msg)
 
 
 def ask_question_json(client: Client, uuid: UUID, question):

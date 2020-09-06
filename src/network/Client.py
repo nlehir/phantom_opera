@@ -1,4 +1,3 @@
-import json
 import time
 from logging import Logger
 from socket import socket
@@ -25,6 +24,7 @@ class Client:
 
     def disconnect(self):
         self.isConnected = False
+        self.sock.close()
 
     def handle_messages(self):
         """
@@ -36,15 +36,17 @@ class Client:
             time.sleep(1)
             if not self.isAuthenticated:
                 self.logger.info("Waiting for authentication of user : " + str(self.threadId))
-                received = Protocol.receive_json(self.sock)
-                msg = json.loads(received)
+                msg = Protocol.receive_string(self.sock)
                 if msg == "inspector connection":
                     self.isAuthenticated = True
                     self.playerType = PlayerType.INSPECTOR
-                if msg == "inspector connection":
+                if msg == "fantom connection":
                     self.isAuthenticated = True
                     self.playerType = PlayerType.FANTOM
                 if self.isAuthenticated:
+                    Protocol.send_string(self.sock, "connection accepted")
                     self.logger.info(str(self.threadId) + ": Authentication accepted, Welcome !")
                 else:
+                    Protocol.send_string(self.sock, "connection refused")
                     self.logger.info(str(self.threadId) + ": Authentication refused, Sorry !")
+                    self.disconnect()

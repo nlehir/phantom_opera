@@ -1,44 +1,16 @@
-import cProfile
 import sys
 from logging import Logger
-from socket import socket
 from threading import Thread
 
-from src.game.PlayerType import PlayerType
 from src.network.Client import Client
 import src.utils.globals as glob
-from src.network.RoomServer import RoomServer
+from src.network.Matchmaking import matchmaking
 
 """
     The order of connexion of the sockets is important.
     inspector is player 0, it must be represented by the first socket.
     fantom is player 1, it must be representer by the second socket.
 """
-
-
-def matchmaking(logger: Logger):
-    """
-        Try to match 2 clients to launch a room for those clients
-    """
-
-    matched_clients = []
-    # Search for an Inspector
-    for c in glob.waiting_clients:
-        if c.playerType == PlayerType.INSPECTOR:
-            matched_clients.append(c)
-            break
-    for c in glob.waiting_clients:
-        if c.playerType == PlayerType.FANTOM:
-            matched_clients.append(c)
-            break
-    if len(matched_clients) == 2:
-        logger.info("Mathcmaking found a match, creating the room")
-        for mc in matched_clients:
-            glob.waiting_clients.remove(mc)
-        room = RoomServer(matched_clients)
-        roomthread = Thread(target=room.run)
-        roomthread.start()
-        glob.roomThreads[room.uuid] = roomthread
 
 
 def handle_connections(logger: Logger):
@@ -54,7 +26,6 @@ def handle_connections(logger: Logger):
             clientthread = Thread(target=client.handle_messages)
             clientthread.start()
             glob.clientThreads[glob.current_thread_id] = clientthread
-            matchmaking(logger)
     except OSError:
         logger.info("Closing the network")
 
@@ -66,6 +37,9 @@ if __name__ == '__main__':
 
     handlerThread = Thread(target=handle_connections, args=(_logger,))
     handlerThread.start()
+
+    matchmakingThread = Thread(target=matchmaking, args=(_logger,))
+    matchmakingThread.start()
 
     while glob.server_running:
         command = input()
@@ -79,5 +53,6 @@ if __name__ == '__main__':
     for roomKey in glob.roomThreads:
         glob.roomThreads[roomKey].join()
     handlerThread.join()
+    matchmakingThread.join()
 
     sys.stdout = sys.__stdout__
