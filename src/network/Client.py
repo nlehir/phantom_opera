@@ -60,7 +60,7 @@ class Client:
                         self.disconnect()
                 except socket.error as e:
                     if isinstance(e.args, tuple):
-                        self.logger.error("errno is %d" % e[0])
+                        self.logger.error("errno error")
                         if e[0] == errno.EPIPE:
                             # remote peer disconnected
                             self.logger.error("Detected remote disconnect")
