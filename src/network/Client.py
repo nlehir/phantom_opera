@@ -33,8 +33,9 @@ class Client:
             But for now this will do well
         """
         while self.isConnected:
-            time.sleep(1)
-            if not self.isAuthenticated:
+            if self.isAuthenticated:
+                time.sleep(5)
+            elif not self.isAuthenticated:
                 self.logger.info("Waiting for authentication of user : " + str(self.threadId))
                 msg = Protocol.receive_string(self.sock)
                 if msg == "inspector connection":
