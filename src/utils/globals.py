@@ -14,7 +14,7 @@ from src.network.Client import Client
 sock: socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 host: str = ''
-port = 12000
+port = int(os.environ.get("PORT", 12000))
 sock.bind((host, port))
 # list that will later contain the sockets
 waiting_clients: List[Client] = []
