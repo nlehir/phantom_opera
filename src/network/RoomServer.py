@@ -8,7 +8,7 @@ from typing import List
 from src.game.Game import Game
 from src.game.Player import Player
 from src.network.Client import Client
-from src.utils.globals import create_logger, clients
+from src.utils.globals import create_logger, clients, loggers
 
 """
     Initialize the data before launching a game
@@ -30,6 +30,7 @@ class RoomServer:
     def close_logger(self):
         self.logger.removeHandler(self.fileHandler)
         self.logger.removeHandler(self.streamHandler)
+        loggers.pop(self.uuid)
 
     def run(self):
         self.logger.info("Room opened, initializing data for the game")
@@ -61,4 +62,5 @@ class RoomServer:
         stats_file = open("./logs/profiling_" + str(self.uuid) + ".txt", 'w')
         sys.stdout = stats_file
         pr.print_stats(sort='time')
+        self.logger.warning("Match: " + str(self.uuid) + " has finished")
         self.close_logger()

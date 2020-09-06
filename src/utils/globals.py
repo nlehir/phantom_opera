@@ -57,26 +57,27 @@ loggers = {}
 formatter = logging.Formatter(
     "%(asctime)s :: %(levelname)s :: %(message)s", "%H:%M:%S")
 # logger to file
-if os.path.exists("./logs/game.log"):
-    os.remove("./logs/game.log")
+if os.path.exists("./logs/server.log"):
+    os.remove("./logs/server.log")
 
 
 def create_logger(uuid: UUID):
     loggers[uuid] = logging.getLogger(str(uuid))
-    loggers[uuid].setLevel(logging.DEBUG)
+    loggers[uuid].setLevel(logging.INFO)
     file_handler = RotatingFileHandler('./logs/game' + str(uuid) + '.log', 'a', 1000000, 1)
-    file_handler.setLevel(logging.DEBUG)
+    file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(formatter)
     loggers[uuid].addHandler(file_handler)
     # logger to console
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.WARNING)
     loggers[uuid].addHandler(stream_handler)
+
     return loggers[uuid], file_handler, stream_handler
 
 
 def create_main_logger():
-    logger = logging.getLogger()
+    logger = logging.getLogger("server")
     logger.setLevel(logging.DEBUG)
     file_handler = RotatingFileHandler('./logs/server.log', 'a', 1000000, 1)
     file_handler.setLevel(logging.DEBUG)
@@ -88,6 +89,3 @@ def create_main_logger():
     logger.addHandler(stream_handler)
     return logger
 
-
-def delete_logger(uuid: UUID):
-    del loggers[uuid]
