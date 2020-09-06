@@ -7,9 +7,15 @@ from logging.handlers import RotatingFileHandler
 
 from src.network import Protocol
 
-host = "localhost"
-port = 12000
-# HEADERSIZE = 10
+heroku = True
+if heroku:
+    hostname = "http://phantom-opera-server.herokuapp.com"
+    host = socket.gethostbyname(hostname)
+    port = 80
+else:
+    host = "localhost"
+    port = 12000
+    # HEADERSIZE = 10
 
 """
 set up inspector logging
