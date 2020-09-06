@@ -44,7 +44,7 @@ def receive_json_from_client(client: Client):
     return json_object
 
 
-def send_json_to_player(client: Client, data):
+def send_json_to_player(client: Client, data: any):
     """
         Converts a python object to json and send it to a client.
 
@@ -57,7 +57,7 @@ def send_json_to_player(client: Client, data):
     Protocol.send(client.sock, msg)
 
 
-def ask_question_json(client: Client, uuid: UUID, question):
+def ask_question_json(client: Client, uuid: UUID, question: any):
     """
         Higher level function handling interaction between the server and
         the clients.

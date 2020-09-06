@@ -11,10 +11,9 @@ from src.network.Client import Client
 """
     server setup
 """
-sock: socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock: socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-host = ''
+host: str = ''
 port = 12000
 sock.bind((host, port))
 # list that will later contain the sockets
@@ -23,7 +22,7 @@ waiting_clients: List[Client] = []
 # what to do with its client list no need for a global here
 clients: Dict[UUID, List[Client]] = {}
 server_running: bool = True
-current_thread_id = -1
+current_thread_id: int = -1
 clientThreads: Dict[int, Thread] = {}
 roomThreads: Dict[UUID, Thread] = {}
 
