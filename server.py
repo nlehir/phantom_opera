@@ -48,6 +48,8 @@ if __name__ == '__main__':
 
     signal.signal(signal.SIGINT, sigint_handler)
 
+    _logger.info("Server successfully started !")
+
     while glob.server_running:
         command = input()
         if command == "quit":
