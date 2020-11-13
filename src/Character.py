@@ -8,13 +8,13 @@ class Character:
     color: str
     suspect: bool
     position: int
-    power: bool
+    power_activated: bool
 
     def __init__(self, color: str):
         self.color = color
         self.suspect = True
         self.position = 0
-        self.power = True
+        self.power_activated = False
 
     def __repr__(self):
         if self.suspect:
@@ -28,5 +28,5 @@ class Character:
             "color": self.color,
             "suspect": self.suspect,
             "position": self.position,
-            "power": self.power
+            "power": self.power_activated
         }

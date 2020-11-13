@@ -29,7 +29,7 @@ class Game:
     def __init__(self, players: List[Player]):
         # Todo: Should be self.players: Tuple[Player] = (player_1, player_2)
         self.players = players
-        self.position_carlotta = 6  # position on the exit path
+        self.position_carlotta = 4  # position on the exit path
         # Todo: Should be removed and make the game ends when carlotta reach 0.
         self.exit = 22
         self.num_tour = 1

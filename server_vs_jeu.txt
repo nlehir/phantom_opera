@@ -1,4 +1,2 @@
 serveur : déplacement d'une case seulement, alors que de potentiellement
 plusieurs dans le serveur, pour simplifier le jeu
-
-personnage brun : il déplace tous les personnages dans le serveur, pas forcément dans le jeu
