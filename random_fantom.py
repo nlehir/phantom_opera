@@ -7,17 +7,9 @@ from logging.handlers import RotatingFileHandler
 
 from src.network import Protocol
 
-heroku = True
-if heroku:
-    hostname = "phantom-opera-server.herokuapp.com"
-    print("Trying to get hostname", flush=True)
-    host = socket.gethostbyname(hostname)
-    print("Got a hostname: " + str(host), flush=True)
-    port = 80
-else:
-    host = "localhost"
-    port = 12000
-    # HEADERSIZE = 10
+host = "localhost"
+port = 12000
+# HEADERSIZE = 10
 
 """
 set up fantom logging
