@@ -28,6 +28,10 @@ after = {'black', 'white'}
 colors = before | permanents | after | both
 
 # ways between rooms
+# rooms are numbered
+# from right to left
+# from bottom to top
+# 0 ---> 9
 passages = [{1, 4}, {0, 2}, {1, 3}, {2, 7}, {0, 5, 8},
             {4, 6}, {5, 7}, {3, 6, 9}, {4, 9}, {7, 8}]
 # ways for the pink character
