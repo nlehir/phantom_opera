@@ -1,3 +1,4 @@
+import signal
 import sys
 from logging import Logger
 from threading import Thread
@@ -30,6 +31,10 @@ def handle_connections(logger: Logger):
         logger.info("Closing the network")
 
 
+def sigint_handler(signum, frame):
+    pass
+
+
 if __name__ == '__main__':
 
     _logger = glob.create_main_logger()
@@ -40,6 +45,8 @@ if __name__ == '__main__':
 
     matchmakingThread = Thread(target=matchmaking, args=(_logger,))
     matchmakingThread.start()
+
+    signal.signal(signal.SIGINT, sigint_handler)
 
     while glob.server_running:
         command = input()
