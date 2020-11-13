@@ -1,7 +1,6 @@
 import json
-import random
 from typing import Tuple
-
+from random import randint, choice
 from src.globals import passages, colors, pink_passages, before, both, after, logger
 from src.utils import ask_question_json
 
@@ -35,7 +34,7 @@ class Player:
 
             power_activation_time = ask_question_json(self, question)
             if power_activation_time not in [0, 1]:
-                power_activation_time = random.choice(activation_possibilities)
+                power_activation_time = choice(activation_possibilities)
             else:
                 power_activation_time = activation_possibilities[power_activation_time]
 
@@ -98,7 +97,7 @@ class Player:
                 'available characters. Choosing random character.'
             )
             logger.warning(warning_message)
-            selected_character = random.randint(0, len(t) - 1)
+            selected_character = randint(0, len(t) - 1)
 
         perso = t[selected_character]
 
@@ -137,7 +136,7 @@ class Player:
 
                 # red character
                 if charact.color == "red":
-                    draw = random.choice(game.alibi_cards)
+                    draw = choice(game.alibi_cards)
                     game.alibi_cards.remove(draw)
                     logger.info(str(draw) + " was drawn")
                     if draw == "fantom":
@@ -233,7 +232,8 @@ class Player:
                 # grey character
                 if charact.color == "grey":
 
-                    available_rooms = [room for room in range(10)]
+                    available_rooms = [room for room in range(10) if room is
+                                       not game.shadow]
                     question = {"question type": "grey character power",
                                 "data": available_rooms,
                                 "game state": game_state}
@@ -246,8 +246,7 @@ class Player:
                             'Choosing random room.'
                         )
                         logger.warning(warning_message)
-                        selected_index = random.randint(
-                            0, len(available_rooms) - 1)
+                        selected_index = randint(0, len(available_rooms) - 1)
                         selected_room = available_rooms[selected_index]
 
                     else:
@@ -274,8 +273,7 @@ class Player:
                             'Choosing random room.'
                         )
                         logger.warning(warning_message)
-                        selected_index = random.randint(
-                            0, len(available_rooms) - 1)
+                        selected_index = randint(0, len(available_rooms) - 1)
                         selected_room = available_rooms[selected_index]
 
                     else:
