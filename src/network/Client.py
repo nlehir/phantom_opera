@@ -19,6 +19,7 @@ class Client:
     username: str
     threadId: int
     logger: Logger
+    hasWon: bool
 
     def __init__(self, sock: socket, threadId: int, logger: Logger):
         self.sock = sock
@@ -28,6 +29,7 @@ class Client:
         self.isPlaying = False
         self.logger = logger
         self.playerType = PlayerType.UNDEFINED
+        self.hasWon = False
 
     def disconnect(self):
         self.isConnected = False

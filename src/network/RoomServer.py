@@ -8,6 +8,7 @@ from typing import List
 from src.game.Game import Game
 from src.game.Player import Player
 from src.network.Client import Client
+from src.utils import csv_manager
 from src.utils.globals import create_logger, clients, loggers
 
 """
@@ -54,6 +55,12 @@ class RoomServer:
 
         game = Game(players, self.roomClients, self.logger)
         game.start()
+
+        for c in self.roomClients:
+            if c.hasWon:
+                csv_manager.insert_success(c.username, c.playerType)
+            else:
+                csv_manager.insert_failure(c.username, c.playerType)
 
         self.roomClients[0].disconnect()
         self.roomClients[1].disconnect()

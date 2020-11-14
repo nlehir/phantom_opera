@@ -7,6 +7,7 @@ from typing import List, Set, Union, Tuple
 
 from src.game.Character import Character
 from src.game.Player import Player
+from src.game.PlayerType import PlayerType
 from src.network.Client import Client
 from src.utils.globals import passages, colors
 
@@ -106,6 +107,11 @@ class Game:
             "active character_cards": self.active_cards_display,
         }
 
+    def set_winner(self, winnerType: PlayerType):
+        for c in self.gameClients:
+            if c.playerType == winnerType:
+                c.hasWon = True
+
     def actions(self):
         """
         phase = tour
@@ -171,10 +177,12 @@ class Game:
             self.tour()
         # game ends
         if self.position_carlotta < self.exit:
+            self.set_winner(PlayerType.INSPECTOR)
             self.logger.info(
                 "----------\n---- inspector wins : fantom is " + str(
                     self.fantom))
         else:
+            self.set_winner(PlayerType.FANTOM)
             self.logger.info("----------\n---- fantom wins")
         # log
         self.logger.info(
