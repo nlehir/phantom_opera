@@ -7,6 +7,10 @@ import src.utils.globals as glob
 from src.network.RoomServer import RoomServer
 
 
+def get_mm_delay_by_queue_size():
+    return 3 / (1 + len(glob.waiting_clients))
+
+
 def matchmaking(logger: Logger):
     """
         Try to match 2 clients to launch a room for those clients
@@ -17,7 +21,7 @@ def matchmaking(logger: Logger):
 
     while glob.server_running:
         # Try to match every 2 seconds
-        time.sleep(2)
+        time.sleep(get_mm_delay_by_queue_size())
 
         if len(glob.waiting_clients) < 2:
             continue
