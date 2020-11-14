@@ -68,7 +68,7 @@ class Player():
 
     def authenticate(self):
         print("Trying to authenticate", flush=True)
-        Protocol.send_string(self.socket, "fantom connection")
+        Protocol.send_string(self.socket, "fantom connection random@epitech.eu")
         print("Asked for authentication", flush=True)
         auth_resp = Protocol.receive_string(self.socket)
         print("Received response : " + auth_resp, flush=True)

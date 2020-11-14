@@ -69,7 +69,7 @@ class Player():
         Protocol.send(self.socket, bytes_data)
 
     def authenticate(self):
-        Protocol.send_string(self.socket, "inspector connection")
+        Protocol.send_string(self.socket, "inspector connection random@epitech.eu")
         auth_resp = Protocol.receive_string(self.socket)
 
         if not auth_resp == "connection accepted":

@@ -36,7 +36,6 @@ def sigint_handler(signum, frame):
 
 
 if __name__ == '__main__':
-
     _logger = glob.create_main_logger()
     _logger.info("Launching server ...")
 
