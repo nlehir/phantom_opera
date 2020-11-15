@@ -9,7 +9,7 @@ from src.game.Game import Game
 from src.game.Player import Player
 from src.network.Client import Client
 from src.utils import csv_manager
-from src.utils.globals import create_logger, clients, loggers
+from src.utils.globals import create_logger, clients, loggers, roomThreads
 
 """
     Initialize the data before launching a game
@@ -73,3 +73,5 @@ class RoomServer:
         pr.print_stats(sort='time')
         self.logger.warning("Match: " + str(self.uuid) + " has finished")
         self.close_logger()
+        roomThreads.pop(self.uuid)
+        clients.pop(self.uuid)

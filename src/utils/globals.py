@@ -78,20 +78,6 @@ def create_logger(uuid: UUID):
 
     return loggers[uuid], file_handler, stream_handler
 
-def create_db_logger():
-    loggers[uuid] = logging.getLogger(str(uuid))
-    loggers[uuid].setLevel(logging.INFO)
-    file_handler = RotatingFileHandler('./logs/game' + str(uuid) + '.log', 'a', 1000000, 1)
-    file_handler.setLevel(logging.INFO)
-    file_handler.setFormatter(formatter)
-    loggers[uuid].addHandler(file_handler)
-    # logger to console
-    stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(logging.WARNING)
-    loggers[uuid].addHandler(stream_handler)
-
-    return loggers[uuid], file_handler, stream_handler
-
 
 def create_main_logger():
     logger = logging.getLogger("server")

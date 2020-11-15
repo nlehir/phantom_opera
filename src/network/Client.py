@@ -7,7 +7,7 @@ from typing import List
 from src.game.PlayerType import PlayerType
 from src.network import Protocol
 from src.utils import email_utils
-from src.utils.globals import remove_waiting_client
+from src.utils.globals import remove_waiting_client, clientThreads, clients
 
 
 class Client:
@@ -36,6 +36,8 @@ class Client:
         self.sock.close()
         if not self.isPlaying:
             remove_waiting_client(self)
+        else:
+            clientThreads.pop(self.threadId)
 
     def refuse_connection(self):
         Protocol.send_string(self.sock, "connection refused")
