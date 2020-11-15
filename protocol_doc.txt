@@ -2,8 +2,8 @@ Authentication:
 
 After initializing your socket to the server you need to authenticate :
 
-Your fantom client must send "fantom connection" then wait for "connection accepted" to be authenticated
-Your inspector client must send "inspector connection" then wait for "connection accepted" to be authenticated
+Your fantom client must send "fantom connection email@epitech.eu" then wait for "connection accepted" to be authenticated
+Your inspector client must send "inspector connection email@epitech.eu" then wait for "connection accepted" to be authenticated
 
 During the authentication if you receive "connection refused" it probably means that there is too much simultaneous connections
 retry later
