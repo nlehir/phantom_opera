@@ -1,3 +1,7 @@
-username,playertype,issuccess,date
-random@epitech.eu,PlayerType.INSPECTOR,1,1605389423.2418668
-random@epitech.eu,PlayerType.FANTOM,0,1605389423.2418668
+username,playertype,issuccess,date
+random@epitech.eu,PlayerType.INSPECTOR,0,1605467026
+random@epitech.eu,PlayerType.FANTOM,1,1605467026
+random@epitech.eu,PlayerType.INSPECTOR,1,1605467081
+random@epitech.eu,PlayerType.FANTOM,0,1605467081
+random@epitech.eu,PlayerType.INSPECTOR,1,1605467148
+random@epitech.eu,PlayerType.FANTOM,0,1605467148
