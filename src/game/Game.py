@@ -42,11 +42,6 @@ class Game:
         # Todo: Should be removed and make the game ends when carlotta reach 0.
         self.exit = 22
         self.num_tour = 1
-        # Todo: Lock should always block the hallway between the room
-        #  occupied by the blue character pawn Madame Giry and the adjacent
-        #  room clockwise.
-        x: int = randrange(10)
-        self.blocked = tuple((x, passages[x].copy().pop()))
         # Todo: Should be a Dict[enum, Character]
         self.characters = set({Character(color) for color in colors})
         # character_cards are used to draw 4 characters at the beginning
@@ -71,27 +66,49 @@ class Game:
         shuffle(self.character_cards)
         # Todo: 2 Should be removed
         shuffle(self.alibi_cards)
-        # Todo:
-        #   rooms_number = list(range(10))
-        #   start_rooms = rooms_number[:5] + rooms_number[7:]
-        #   for c in self.characters:
-        #       c.position = random.choice(start_rooms)
-        #       start_rooms.remove(c.position)
-        for i, p in enumerate(self.character_cards):
-            p.position = i
+        # Initialise character positions
+        # Rooms at the center of the game are not available
+        rooms_number = list(range(10))
+        start_rooms = rooms_number[:5] + rooms_number[7:]
+        for character in self.characters:
+            character.position = choice(start_rooms)
+
 
         for character in self.characters:
             # get position of grey character
             if character.color == "grey":
                 grey_character_position = character.display()["position"]
                 self.shadow = grey_character_position
+            if character.color == "blue":
+                blue_character_position = character.display()["position"]
+                # initially the blocked passage is
+                # next to blue character clockwise
+                if blue_character_position == 0:
+                    self.blocked = (0, 1)
+                elif blue_character_position == 1:
+                    self.blocked = (1, 2)
+                elif blue_character_position == 2:
+                    self.blocked = (2, 3)
+                elif blue_character_position == 3:
+                    self.blocked = (3, 4)
+                elif blue_character_position == 4:
+                    self.blocked = (4, 5)
+                elif blue_character_position == 7:
+                    self.blocked = (7, 9)
+                elif blue_character_position == 9:
+                    self.blocked = (8, 9)
+                elif blue_character_position == 8:
+                    self.blocked = (4, 8)
+                else:
+                    print(blue_character_position)
+                    raise ValueError("Wrong initial position of blue character")
 
         self.characters_display = [character.display() for character in
                                    self.characters]
 
         # Todo: should be removed
         self.character_cards_display = [tile.display() for tile in
-                              self.character_cards]
+                                        self.character_cards]
         self.active_cards_display = [tile.display() for tile in
                                      self.active_cards]
 
@@ -208,7 +225,7 @@ class Game:
                                    self.characters]
         # Todo: should be removed
         self.character_cards_display = [tile.display() for tile in
-                              self.character_cards]
+                                        self.character_cards]
         self.active_cards_display = [tile.display() for tile in
                                      self.active_cards]
         # update
