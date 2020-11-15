@@ -162,7 +162,8 @@ class Player:
                 if charact.color == "purple":
                     # logger.debug("Rappel des positions :\n" + str(game))
 
-                    available_characters = [q for q in game.characters if q.color is not "purple"]
+                    available_characters = [q for q in game.characters if
+                                            q.color != "purple"]
 
                     # the socket can not take an object
                     available_colors=[q.color for q in available_characters]
@@ -201,7 +202,7 @@ class Player:
                     # when moving.
                     available_characters = [q for q in game.characters if
                                             charact.position == q.position if
-                                            q.color is not "brown"]
+                                            q.color != "brown"]
 
 
                     # the socket can not take an object
