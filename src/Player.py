@@ -21,19 +21,20 @@ class Player:
         logger.info("--\n" + self.role + " plays\n--")
 
         logger.debug(json.dumps(game.update_game_state(""), indent=4))
-        charact = self.select(game.active_cards, game.update_game_state(self.role))
-
+        charact = self.select(
+            game.active_cards, game.update_game_state(self.role))
 
         # purple and brown power choose to activate or not before moving
         moved_character = self.activate_power(charact,
-                                               game,
-                                               before,
-                                               game.update_game_state(self.role))
+                                              game,
+                                              before,
+                                              game.update_game_state(self.role))
 
         self.move(charact,
                   moved_character,
                   game.blocked,
-                  game.update_game_state(self.role))
+                  game.update_game_state(self.role),
+                  game)
 
         self.activate_power(charact,
                             game,
@@ -45,7 +46,8 @@ class Player:
             Choose the character to activate whithin
             the given choices.
         """
-        available_characters = [character.display() for character in active_cards]
+        available_characters = [character.display()
+                                for character in active_cards]
         question = {"question type": "select character",
                     "data": available_characters,
                     "game state": game_state}
@@ -67,6 +69,23 @@ class Player:
 
         del active_cards[selected_character]
         return perso
+
+
+    def get_adjacent_positions(self, charact, game):
+        if charact.color == "pink":
+            active_passages = pink_passages
+        else:
+            active_passages = passages
+        return [room for room in active_passages[charact.position] if set([room, charact.position]) != set(game.blocked)]
+
+
+    def get_adjacent_positions_from_position(self, position, charact, game):
+        if charact.color == "pink":
+            active_passages = pink_passages
+        else:
+            active_passages = passages
+        return [room for room in active_passages[position] if set([room, position]) != set(game.blocked)]
+
 
     def activate_power(self, charact, game, activables, game_state):
         """
@@ -115,8 +134,7 @@ class Player:
                 # black character
                 if charact.color == "black":
                     for q in game.characters:
-                        if q.position in {x for x in passages[charact.position] if
-                                          x not in game.blocked or q.position not in game.blocked}:
+                        if q.position in self.get_adjacent_positions(charact, game):
                             q.position = charact.position
                             logger.info("new position : " + str(q))
 
@@ -124,12 +142,9 @@ class Player:
                 if charact.color == "white":
                     for moved_character in game.characters:
                         if moved_character.position == charact.position and charact != moved_character:
-                            disp = {
-                                x for x in passages[charact.position]
-                                if x not in game.blocked or moved_character.position not in game.blocked}
+                            available_positions = self.get_adjacent_positions(
+                                charact, game)
 
-                            # edit
-                            available_positions = list(disp)
                             # format the name of the moved character to string
                             character_to_move = str(
                                 moved_character).split("-")[0]
@@ -139,13 +154,13 @@ class Player:
                             selected_index = ask_question_json(self, question)
 
                             # test
-                            if selected_index not in range(len(disp)):
+                            if selected_index not in range(len(available_positions)):
                                 warning_message = (
                                     ' !  : selected position not available '
                                     'Choosing random position.'
                                 )
                                 logger.warning(warning_message)
-                                selected_position = disp.pop()
+                                selected_position = choice(available_positions)
 
                             else:
                                 selected_position = available_positions[selected_index]
@@ -166,7 +181,7 @@ class Player:
                                             q.color != "purple"]
 
                     # the socket can not take an object
-                    available_colors=[q.color for q in available_characters]
+                    available_colors = [q.color for q in available_characters]
 
                     question = {"question type": "purple character power",
                                 "data": available_colors,
@@ -180,7 +195,7 @@ class Player:
                             'Choosing random character.'
                         )
                         logger.warning(warning_message)
-                        selected_character = colors.pop()
+                        selected_character = choice(colors)
 
                     else:
                         selected_character = available_characters[selected_index]
@@ -204,9 +219,8 @@ class Player:
                                             charact.position == q.position if
                                             q.color != "brown"]
 
-
                     # the socket can not take an object
-                    available_colors=[q.color for q in available_characters]
+                    available_colors = [q.color for q in available_characters]
                     if len(available_colors) > 0:
                         question = {"question type": "brown character power",
                                     "data": available_colors,
@@ -220,7 +234,7 @@ class Player:
                                 'Choosing random character.'
                             )
                             logger.warning(warning_message)
-                            selected_character = colors.pop()
+                            selected_character = choice(colors)
                         else:
                             selected_character = available_characters[selected_index]
 
@@ -295,7 +309,7 @@ class Player:
                             'Choosing random exit.'
                         )
                         logger.warning(warning_message)
-                        selected_exit = passages_work.pop()
+                        selected_exit = choice(passages_work)
 
                     else:
                         selected_exit = available_exits[selected_index]
@@ -308,37 +322,64 @@ class Player:
                 # if the power was not used
                 return None
 
-    def move(self, charact, moved_character, blocked, game_state):
+    def move(self, charact, moved_character, blocked, game_state, game):
         """
             Select a new position for the character.
         """
-        pass_act = pink_passages if charact.color == 'pink' else passages
 
-        # if the character is purple and the power has 
+        # get the number of characters in the same room
+        characters_in_room = [
+            q for q in game.characters if q.position == charact.position]
+        number_of_characters_in_room = len(characters_in_room)
+        print(f"characters in room {characters_in_room}")
+        print(f"number of characters in room: {number_of_characters_in_room}")
+
+        # get the available rooms from a given position
+        available_rooms = list()
+        available_rooms.append(self.get_adjacent_positions(charact, game))
+        for step in range(1, number_of_characters_in_room):
+            # build rooms that are a distance equal to step+1
+            next_rooms = list()
+            for room in available_rooms[step-1]:
+                next_rooms += self.get_adjacent_positions_from_position(room,
+                                                                        charact,
+                                                                        game)
+            available_rooms.append(next_rooms)
+
+        # flatten the obtained list
+        temp = list()
+        for sublist in available_rooms:
+            for room in sublist:
+                temp.append(room)
+
+
+        # filter the list in order to keep an unique occurrence of each room
+        temp = set(temp)
+        available_positions = list(temp)
+
+        # test
+        # print(available_positions)
+        # print(game.blocked)
+
+        # if the character is purple and the power has
         # already been used, we pass since it was already moved
         # (the positions were swapped)
         if charact.color == "purple" and charact.power_activated:
             pass
-
-
         else:
-            disp = {x for x in pass_act[charact.position]
-                    if charact.position not in blocked or x not in blocked}
-
-            available_positions = list(disp)
             question = {"question type": "select position",
                         "data": available_positions,
                         "game state": game_state}
             selected_index = ask_question_json(self, question)
 
             # test
-            if selected_index not in range(len(disp)):
+            if selected_index not in range(len(available_positions)):
                 warning_message = (
                     ' !  : selected position not available '
                     'Choosing random position.'
                 )
                 logger.warning(warning_message)
-                selected_position = disp.pop()
+                selected_position = choice(available_positions)
 
             else:
                 selected_position = available_positions[selected_index]

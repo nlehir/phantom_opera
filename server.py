@@ -18,7 +18,7 @@ def init_connexion():
         (clientsocket, addr) = link.accept()
         logger.info("Received client !")
         clients.append(clientsocket)
-        clientsocket.settimeout(500)
+        clientsocket.settimeout(10)
 
 
 if __name__ == '__main__':

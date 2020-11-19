@@ -14,10 +14,6 @@ You can find the rules of the game in ./le-fantom-de-l-opera_rules_fr.pdf
 
 You can also use a more recent version of python.
 
-## Difference between the board game and the server
-
-In order to simplify the game, the characters can move only to an adjacent room in the server.
-
 ## Additional information 
 
 you can set the level of importance of the logging messages : 
