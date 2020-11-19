@@ -23,3 +23,8 @@ you can set the level of importance of the logging messages :
 ## Todo
 
 Edit protocol and server so that the players could connect in whatever order.
+
+## Timeout
+
+There is now a timeout of 10 seconds to answer the questions asked by the
+server.
