@@ -1,2 +1,0 @@
-serveur : déplacement d'une case seulement, alors que de potentiellement
-plusieurs dans le serveur, pour simplifier le jeu

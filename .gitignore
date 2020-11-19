@@ -6,6 +6,7 @@ logs/fantom.log
 logs/game.log
 logs/inspector.log
 logs/profiling.txt
+changelog.txt
 __pycache__/*
 
 .idea/*
