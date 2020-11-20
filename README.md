@@ -20,7 +20,7 @@ You can set the level of importance of the logging messages :
 - sent to text files
 - sent to the console
 
-## Difference between
+## Difference between game and server
 Brown character : takes the moved character to his final position, instead of
 any position on the path taken by the brown character.
 
