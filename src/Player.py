@@ -331,8 +331,8 @@ class Player:
         characters_in_room = [
             q for q in game.characters if q.position == charact.position]
         number_of_characters_in_room = len(characters_in_room)
-        print(f"characters in room {characters_in_room}")
-        print(f"number of characters in room: {number_of_characters_in_room}")
+        # print(f"characters in room {characters_in_room}")
+        # print(f"number of characters in room: {number_of_characters_in_room}")
 
         # get the available rooms from a given position
         available_rooms = list()
