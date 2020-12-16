@@ -135,6 +135,11 @@ class Game:
             self.active_cards = self.character_cards[:4]
         else:
             self.active_cards = self.character_cards[4:]
+
+        # the characters should be able to use their power at each new round
+        for card in self.active_cards:
+            card.power_activated = False
+
         for i in [first_player_in_phase, 1 - first_player_in_phase,
                   1 - first_player_in_phase, first_player_in_phase]:
             self.players[i].play(self)
