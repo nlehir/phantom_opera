@@ -391,8 +391,8 @@ class Player:
             # it the character is brown and the power has been activated
             # we move several characters with him
             if charact.color == "brown" and charact.power_activated:
+                charact.position = selected_position
                 if moved_character:
-                    charact.position = selected_position
                     moved_character.position = selected_position
             else:
                 charact.position = selected_position
