@@ -18,17 +18,19 @@ fantom_logger = logging.getLogger()
 fantom_logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter(
     "%(asctime)s :: %(levelname)s :: %(message)s", "%H:%M:%S")
-# file
-if os.path.exists("./logs/fantom.log"):
-    os.remove("./logs/fantom.log")
-file_handler = RotatingFileHandler('./logs/fantom.log', 'a', 1000000, 1)
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(formatter)
-fantom_logger.addHandler(file_handler)
-# stream
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.WARNING)
-fantom_logger.addHandler(stream_handler)
+
+
+# # file
+# if os.path.exists("./logs/fantom.log"):
+#     os.remove("./logs/fantom.log")
+# file_handler = RotatingFileHandler('./logs/fantom.log', 'a', 1000000, 1)
+# file_handler.setLevel(logging.DEBUG)
+# file_handler.setFormatter(formatter)
+# fantom_logger.addHandler(file_handler)
+# # stream
+# stream_handler = logging.StreamHandler()
+# stream_handler.setLevel(logging.WARNING)
+# fantom_logger.addHandler(stream_handler)
 
 
 class Player():

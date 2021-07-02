@@ -19,17 +19,17 @@ inspector_logger = logging.getLogger()
 inspector_logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter(
     "%(asctime)s :: %(levelname)s :: %(message)s", "%H:%M:%S")
-# file
-if os.path.exists("./logs/inspector.log"):
-    os.remove("./logs/inspector.log")
-file_handler = RotatingFileHandler('./logs/inspector.log', 'a', 1000000, 1)
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(formatter)
-inspector_logger.addHandler(file_handler)
-# stream
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.WARNING)
-inspector_logger.addHandler(stream_handler)
+# # file
+# if os.path.exists("./logs/inspector.log"):
+#     os.remove("./logs/inspector.log")
+# file_handler = RotatingFileHandler('./logs/inspector.log', 'a', 1000000, 1)
+# file_handler.setLevel(logging.DEBUG)
+# file_handler.setFormatter(formatter)
+# inspector_logger.addHandler(file_handler)
+# # stream
+# stream_handler = logging.StreamHandler()
+# stream_handler.setLevel(logging.WARNING)
+# inspector_logger.addHandler(stream_handler)
 
 
 class Player():
