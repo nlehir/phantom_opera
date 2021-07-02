@@ -5,7 +5,7 @@ from uuid import UUID
 
 from src.network import Protocol
 from src.network.Client import Client
-from src.utils.globals import clients, clientThreads
+import src.utils.globals as glob
 
 """
     Functions handling exchanges between
@@ -25,21 +25,7 @@ def receive_json_from_player(client: Client, uuid: UUID):
     # logger.debug(f"receive json from player {player}")
     received_bytes = Protocol.receive(client.sock)
     if len(received_bytes) == 0:
-        terminate_game(clients[uuid], uuid)
-    json_object = json.loads(received_bytes)
-    return json_object
-
-
-def receive_json_from_client(client: Client):
-    """
-        Receives a python object from the client and converts it to a python
-        object.
-    """
-    received_bytes = Protocol.receive(client.sock)
-    if len(received_bytes) == 0:
-        client.disconnect()
-        clientThreads[client.threadId].join()
-        clientThreads.pop(client.threadId)
+        terminate_game(glob.clients[uuid], uuid)
     json_object = json.loads(received_bytes)
     return json_object
 
@@ -78,9 +64,7 @@ def terminate_game(game_clients: List[Client], uuid: UUID):
     """
     for client in game_clients:
         client.disconnect()
-        clientThreads[client.threadId].join()
-        client.sock.close()
-        clientThreads.pop(client.threadId)
 
-    clients.pop(uuid)
+    glob.clients.pop(uuid)
+    glob.roomThreads.pop(uuid)
     sys.exit()  # Terminate the game thread after clearing everything

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
-import socket
+import threading
 from logging.handlers import RotatingFileHandler
 from threading import Thread
 from typing import List, Dict
@@ -15,19 +15,15 @@ if TYPE_CHECKING:
 """
     server setup
 """
-sock: socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-host: str = ''
-port = int(os.environ.get("PORT", 12000))
-sock.bind((host, port))
 # list that will later contain the sockets
 waiting_clients: List[Client] = []
+lockWaitingClients = threading.Lock()
+
 # Dico of clients to retreive them if needed, in the future this will disapear only the room server should decide
 # what to do with its client list no need for a global here
 clients: Dict[UUID, List[Client]] = {}
 server_running: bool = True
 current_thread_id: int = -1
-clientThreads: Dict[int, Thread] = {}
 roomThreads: Dict[UUID, Thread] = {}
 
 """
@@ -106,4 +102,5 @@ def create_main_logger():
 
 
 def remove_waiting_client(client: Client):
-    waiting_clients.remove(client)
+    with lockWaitingClients:
+        waiting_clients.remove(client)

@@ -38,7 +38,8 @@ def matchmaking(logger: Logger):
         if len(matched_clients) == 2:
             logger.info("Mathcmaking found a match, creating the room")
             for mc in matched_clients:
-                glob.waiting_clients.remove(mc)
+                with glob.lockWaitingClients:
+                    glob.waiting_clients.remove(mc)
             room = RoomServer(matched_clients)
             roomthread = Thread(target=room.run)
             roomthread.start()

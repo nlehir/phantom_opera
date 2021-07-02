@@ -2,12 +2,13 @@ import errno
 import time
 from logging import Logger
 import socket
+from threading import Thread
 from typing import List
 
 from src.game.PlayerType import PlayerType
 from src.network import Protocol
 from src.utils import email_utils
-from src.utils.globals import remove_waiting_client, clientThreads, clients
+from src.utils.globals import remove_waiting_client, clients
 
 
 class Client:
@@ -17,31 +18,34 @@ class Client:
     isPlaying: bool
     playerType: PlayerType
     username: str
-    threadId: int
+    clientId: int
     logger: Logger
     hasWon: bool
+    clientAuthenticationThread: Thread
 
     def __init__(self, sock: socket, threadId: int, logger: Logger):
         self.sock = sock
-        self.threadId = threadId
+        self.clientId = threadId
         self.isConnected = True
         self.isAuthenticated = False
         self.isPlaying = False
         self.logger = logger
         self.playerType = PlayerType.UNDEFINED
         self.hasWon = False
+        self.clientAuthenticationThread = Thread(target=self.handle_messages)
+        self.clientAuthenticationThread.start()
 
     def disconnect(self):
         self.isConnected = False
         self.sock.close()
+        if self.clientAuthenticationThread.is_alive():
+            self.clientAuthenticationThread.join()
         if not self.isPlaying:
             remove_waiting_client(self)
-        else:
-            clientThreads.pop(self.threadId)
 
     def refuse_connection(self):
         Protocol.send_string(self.sock, "connection refused")
-        self.logger.info(str(self.threadId) + ": Authentication refused, Sorry !")
+        self.logger.info(str(self.clientId) + ": Authentication refused, Sorry !")
         self.disconnect()
 
     def accept_connection(self, client_type: PlayerType, username: str):
@@ -62,11 +66,9 @@ class Client:
             But for now this will do well
         """
         while self.isConnected:
-            if self.isAuthenticated:
-                time.sleep(5)
-            elif not self.isAuthenticated:
+            if not self.isAuthenticated:
                 try:
-                    self.logger.info("Waiting for authentication of user : " + str(self.threadId))
+                    self.logger.info("Waiting for authentication of user : " + str(self.clientId))
                     msg = Protocol.receive_string(self.sock)
                     tokens = msg.split()
                     if len(tokens) != 3:
@@ -77,7 +79,8 @@ class Client:
                         self.check_authentication(tokens, PlayerType.FANTOM)
                     if self.isAuthenticated:
                         Protocol.send_string(self.sock, "connection accepted")
-                        self.logger.info(str(self.threadId) + ": Authentication accepted, Welcome !")
+                        self.logger.info(str(self.clientId) + ": Authentication accepted, Welcome !")
+                        return
                     else:
                         self.refuse_connection()
                 except socket.error as e:
