@@ -1,12 +1,8 @@
 #!/bin/bash
 
-ulimit -l unlimited
-ulimit -n 10240
-ulimit -u 10240
-
 i="0"
 
-nbRuns="10"
+nbRuns=$1
 
 while [ $i -lt $nbRuns ]
 do
