@@ -1,7 +1,11 @@
 import json
+import sys
+from typing import List
+from uuid import UUID
 
-import protocol
-from src.globals import logger, clients
+from src.network import Protocol
+from src.network.Client import Client
+import src.utils.globals as glob
 
 """
     Functions handling exchanges between
@@ -9,7 +13,7 @@ from src.globals import logger, clients
 """
 
 
-def receive_json_from_player(player):
+def receive_json_from_player(client: Client, uuid: UUID):
     """
         Receives a python object from the client and converts it to a python
         object.
@@ -19,12 +23,14 @@ def receive_json_from_player(player):
         :return: return a python-readable object.
     """
     # logger.debug(f"receive json from player {player}")
-    received_bytes = protocol.receive_json(clients[player])
+    received_bytes = Protocol.receive(client.sock)
+    if len(received_bytes) == 0:
+        terminate_game(glob.clients[uuid], uuid)
     json_object = json.loads(received_bytes)
     return json_object
 
 
-def send_json_to_player(player, data):
+def send_json_to_player(client: Client, data: any):
     """
         Converts a python object to json and send it to a client.
 
@@ -34,10 +40,10 @@ def send_json_to_player(player, data):
     """
     # logger.debug(f"send json to player {player}")
     msg = json.dumps(data).encode("utf-8")
-    protocol.send_json(clients[player], msg)
+    Protocol.send(client.sock, msg)
 
 
-def ask_question_json(player, question):
+def ask_question_json(client: Client, uuid: UUID, question: any):
     """
         Higher level function handling interaction between the server and
         the clients.
@@ -47,5 +53,18 @@ def ask_question_json(player, question):
         the game.
         :return: returns the answer to the question asked.
     """
-    send_json_to_player(player.num, question)
-    return receive_json_from_player(player.num)
+    send_json_to_player(client, question)
+    return receive_json_from_player(client, uuid)
+
+
+def terminate_game(game_clients: List[Client], uuid: UUID):
+    """
+        Temporary way to handle a disconnection error during the game
+        Logger is probably not closed properly tho
+    """
+    for client in game_clients:
+        client.disconnect()
+
+    glob.clients.pop(uuid)
+    glob.roomThreads.pop(uuid)
+    sys.exit()  # Terminate the game thread after clearing everything

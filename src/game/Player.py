@@ -1,8 +1,11 @@
 import json
-from typing import Tuple
 from random import randint, choice
-from src.globals import passages, colors, pink_passages, before, after, logger, mandatory_powers
-from src.utils import ask_question_json
+from logging import Logger
+from uuid import UUID
+
+from src.network.Client import Client
+from src.utils.globals import passages, colors, pink_passages, before, after, mandatory_powers
+from src.utils.utils import ask_question_json
 
 
 class Player:
@@ -10,17 +13,23 @@ class Player:
         Class representing the players, either the inspector (player 0)
         or the fantom (player 1)
     """
-    num: int
+    id: int
+    client: Client
+    uuid: UUID
 
-    def __init__(self, n: int):
-        self.num = n
+    def __init__(self, n: int, client: Client, uuid: UUID, logger: Logger):
+        self.id = n
+        self.client = client
+        self.logger = logger
+        self.uuid = uuid
+
         # Todo: Should not be a str, enum instead.
         self.role: str = "inspector" if n == 0 else "fantom"
 
     def play(self, game):
-        logger.info("--\n" + self.role + " plays\n--")
+        self.logger.info("--\n" + self.role + " plays\n--")
 
-        logger.debug(json.dumps(game.update_game_state(""), indent=4))
+        self.logger.debug(json.dumps(game.update_game_state(""), indent=4))
         charact = self.select(
             game.active_cards, game.update_game_state(self.role))
 
@@ -51,25 +60,24 @@ class Player:
         question = {"question type": "select character",
                     "data": available_characters,
                     "game state": game_state}
-        selected_character = ask_question_json(self, question)
+        selected_character = ask_question_json(self.client, self.uuid, question)
 
         if selected_character not in range(len(active_cards)):
             warning_message = (
                 ' !  : selected character not in '
                 'available characters. Choosing random character.'
             )
-            logger.warning(warning_message)
+            self.logger.warning(warning_message)
             selected_character = randint(0, len(active_cards) - 1)
 
         perso = active_cards[selected_character]
 
         # log
-        logger.info(f"question : {question['question type']}")
-        logger.info(f"answer : {perso}")
+        self.logger.info(f"question : {question['question type']}")
+        self.logger.info(f"answer : {perso}")
 
         del active_cards[selected_character]
         return perso
-
 
     def get_adjacent_positions(self, charact, game):
         if charact.color == "pink":
@@ -78,14 +86,12 @@ class Player:
             active_passages = passages
         return [room for room in active_passages[charact.position] if set([room, charact.position]) != set(game.blocked)]
 
-
     def get_adjacent_positions_from_position(self, position, charact, game):
         if charact.color == "pink":
             active_passages = pink_passages
         else:
             active_passages = passages
         return [room for room in active_passages[position] if set([room, position]) != set(game.blocked)]
-
 
     def activate_power(self, charact, game, activables, game_state):
         """
@@ -94,41 +100,39 @@ class Player:
         # check if the power should be used before of after moving
         # this depends on the "activables" variable, which is a set.
         if not charact.power_activated and charact.color in activables:
-
             # check if special power is mandatory
             if charact.color in mandatory_powers:
                 power_activation = 1
-
             # special power is not mandatory
             else:
                 question = {"question type": f"activate {charact.color} power",
                             "data": [0, 1],
                             "game state": game_state}
-                power_activation = ask_question_json(self, question)
+                power_activation = ask_question_json(self.client, self.uuid, question)
 
                 # log
-                logger.info(f"question : {question['question type']}")
+                self.logger.info(f"question : {question['question type']}")
                 if power_activation == 1:
                     power_answer = "yes"
                 else:
                     power_answer = "no"
-                logger.info(f"answer  : {power_answer}")
+                self.logger.info(f"answer  : {power_answer}")
 
             # the power will be used
             # charact.power represents the fact that
             # the power is still available
             if power_activation:
-                logger.info(charact.color + " power activated")
+                self.logger.info(charact.color + " power activated")
                 charact.power_activated = True
 
                 # red character
                 if charact.color == "red":
                     draw = choice(game.alibi_cards)
                     game.alibi_cards.remove(draw)
-                    logger.info(str(draw) + " was drawn")
+                    self.logger.info(str(draw) + " was drawn")
                     if draw == "fantom":
-                        game.position_carlotta += -1 if self.num == 0 else 1
-                    elif self.num == 0:
+                        game.position_carlotta += -1 if self.id == 0 else 1
+                    elif self.id == 0:
                         draw.suspect = False
 
                 # black character
@@ -136,7 +140,7 @@ class Player:
                     for q in game.characters:
                         if q.position in self.get_adjacent_positions(charact, game):
                             q.position = charact.position
-                            logger.info("new position : " + str(q))
+                            self.logger.info("new position : " + str(q))
 
                 # white character
                 if charact.color == "white":
@@ -151,7 +155,7 @@ class Player:
                             question = {"question type": "white character power move " + character_to_move,
                                         "data": available_positions,
                                         "game state": game_state}
-                            selected_index = ask_question_json(self, question)
+                            selected_index = ask_question_json(self.client, self.uuid, question)
 
                             # test
                             if selected_index not in range(len(available_positions)):
@@ -159,19 +163,19 @@ class Player:
                                     ' !  : selected position not available '
                                     'Choosing random position.'
                                 )
-                                logger.warning(warning_message)
+                                self.logger.warning(warning_message)
                                 selected_position = choice(available_positions)
 
                             else:
                                 selected_position = available_positions[selected_index]
 
-                            logger.info(
+                            self.logger.info(
                                 f"question : {question['question type']}")
-                            logger.info("answer : " +
-                                        str(selected_position))
+                            self.logger.info("answer : " +
+                                             str(selected_position))
                             moved_character.position = selected_position
-                            logger.info("new position : " +
-                                        str(moved_character))
+                            self.logger.info("new position : " +
+                                             str(moved_character))
 
                 # purple character
                 if charact.color == "purple":
@@ -179,14 +183,13 @@ class Player:
 
                     available_characters = [q for q in game.characters if
                                             q.color != "purple"]
-
                     # the socket can not take an object
                     available_colors = [q.color for q in available_characters]
 
                     question = {"question type": "purple character power",
                                 "data": available_colors,
                                 "game state": game_state}
-                    selected_index = ask_question_json(self, question)
+                    selected_index = ask_question_json(self.client, self.uuid, question)
 
                     # test
                     if selected_index not in range(len(colors)):
@@ -194,20 +197,19 @@ class Player:
                             ' !  : selected character not available '
                             'Choosing random character.'
                         )
-                        logger.warning(warning_message)
+                        self.logger.warning(warning_message)
                         selected_character = choice(colors)
 
                     else:
                         selected_character = available_characters[selected_index]
 
-                    logger.info(f"question : {question['question type']}")
-                    logger.info(f"answer : {selected_character}")
+                    self.logger.info(f"question : {question['question type']}")
+                    self.logger.info(f"answer : {selected_character}")
 
                     # swap positions
                     charact.position, selected_character.position = selected_character.position, charact.position
-
-                    logger.info(f"new position : {charact}")
-                    logger.info(f"new position : {selected_character}")
+                    self.logger.info(f"new position : {charact}")
+                    self.logger.info(f"new position : {selected_character}")
 
                     return selected_character
 
@@ -225,7 +227,7 @@ class Player:
                         question = {"question type": "brown character power",
                                     "data": available_colors,
                                     "game state": game_state}
-                        selected_index = ask_question_json(self, question)
+                        selected_index = ask_question_json(self.client, self.uuid, question)
 
                         # test
                         if selected_index not in range(len(colors)):
@@ -233,13 +235,13 @@ class Player:
                                 ' !  : selected character not available '
                                 'Choosing random character.'
                             )
-                            logger.warning(warning_message)
+                            self.logger.warning(warning_message)
                             selected_character = choice(colors)
                         else:
                             selected_character = available_characters[selected_index]
 
-                        logger.info(f"question : {question['question type']}")
-                        logger.info(f"answer : {selected_character}")
+                        self.logger.info(f"question : {question['question type']}")
+                        self.logger.info(f"answer : {selected_character}")
                         return selected_character
                     else:
                         return None
@@ -252,7 +254,7 @@ class Player:
                     question = {"question type": "grey character power",
                                 "data": available_rooms,
                                 "game state": game_state}
-                    selected_index = ask_question_json(self, question)
+                    selected_index = ask_question_json(self.client, self.uuid, question)
 
                     # test
                     if selected_index not in range(len(available_rooms)):
@@ -260,16 +262,17 @@ class Player:
                             ' !  : selected room not available '
                             'Choosing random room.'
                         )
-                        logger.warning(warning_message)
-                        selected_index = randint(0, len(available_rooms) - 1)
+                        self.logger.warning(warning_message)
+                        selected_index = randint(
+                            0, len(available_rooms) - 1)
                         selected_room = available_rooms[selected_index]
 
                     else:
                         selected_room = available_rooms[selected_index]
 
                     game.shadow = selected_room
-                    logger.info(f"question : {question['question type']}")
-                    logger.info("answer : " + str(game.shadow))
+                    self.logger.info(f"question : {question['question type']}")
+                    self.logger.info("answer : " + str(game.shadow))
 
                 # blue character
                 if charact.color == "blue":
@@ -279,7 +282,7 @@ class Player:
                     question = {"question type": "blue character power room",
                                 "data": available_rooms,
                                 "game state": game_state}
-                    selected_index = ask_question_json(self, question)
+                    selected_index = ask_question_json(self.client, self.uuid, question)
 
                     # test
                     if selected_index not in range(len(available_rooms)):
@@ -287,8 +290,9 @@ class Player:
                             ' !  : selected room not available '
                             'Choosing random room.'
                         )
-                        logger.warning(warning_message)
-                        selected_index = randint(0, len(available_rooms) - 1)
+                        self.logger.warning(warning_message)
+                        selected_index = randint(
+                            0, len(available_rooms) - 1)
                         selected_room = available_rooms[selected_index]
 
                     else:
@@ -300,7 +304,7 @@ class Player:
                     question = {"question type": "blue character power exit",
                                 "data": available_exits,
                                 "game state": game_state}
-                    selected_index = ask_question_json(self, question)
+                    selected_index = ask_question_json(self.client, self.uuid, question)
 
                     # test
                     if selected_index not in range(len(available_exits)):
@@ -308,19 +312,19 @@ class Player:
                             ' !  : selected exit not available '
                             'Choosing random exit.'
                         )
-                        logger.warning(warning_message)
+                        self.logger.warning(warning_message)
                         selected_exit = choice(passages_work)
 
                     else:
                         selected_exit = available_exits[selected_index]
 
-                    logger.info(f"question : {question['question type']}")
-                    logger.info("answer : " +
-                                str({selected_room, selected_exit}))
+                    self.logger.info(f"question : {question['question type']}")
+                    self.logger.info("answer : " +
+                                     str({selected_room, selected_exit}))
                     game.blocked = tuple((selected_room, selected_exit))
-            else:
-                # if the power was not used
-                return None
+        else:
+            # if the power was not used
+            return None
 
     def move(self, charact, moved_character, blocked, game_state, game):
         """
@@ -352,7 +356,6 @@ class Player:
             for room in sublist:
                 temp.append(room)
 
-
         # filter the list in order to keep an unique occurrence of each room
         temp = set(temp)
         available_positions = list(temp)
@@ -366,11 +369,12 @@ class Player:
         # (the positions were swapped)
         if charact.color == "purple" and charact.power_activated:
             pass
+
         else:
             question = {"question type": "select position",
                         "data": available_positions,
                         "game state": game_state}
-            selected_index = ask_question_json(self, question)
+            selected_index = ask_question_json(self.client, self.uuid, question)
 
             # test
             if selected_index not in range(len(available_positions)):
@@ -378,15 +382,15 @@ class Player:
                     ' !  : selected position not available '
                     'Choosing random position.'
                 )
-                logger.warning(warning_message)
+                self.logger.warning(warning_message)
                 selected_position = choice(available_positions)
 
             else:
                 selected_position = available_positions[selected_index]
 
-            logger.info(f"question : {question['question type']}")
-            logger.info(f"answer : {selected_position}")
-            logger.info(f"new position : {selected_position}")
+            self.logger.info(f"question : {question['question type']}")
+            self.logger.info(f"answer : {selected_position}")
+            self.logger.info(f"new position : {selected_position}")
 
             # it the character is brown and the power has been activated
             # we move several characters with him

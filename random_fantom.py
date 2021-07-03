@@ -5,7 +5,7 @@ import random
 import socket
 from logging.handlers import RotatingFileHandler
 
-import protocol
+from src.network import Protocol
 
 host = "localhost"
 port = 12000
@@ -18,17 +18,19 @@ fantom_logger = logging.getLogger()
 fantom_logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter(
     "%(asctime)s :: %(levelname)s :: %(message)s", "%H:%M:%S")
-# file
-if os.path.exists("./logs/fantom.log"):
-    os.remove("./logs/fantom.log")
-file_handler = RotatingFileHandler('./logs/fantom.log', 'a', 1000000, 1)
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(formatter)
-fantom_logger.addHandler(file_handler)
-# stream
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.WARNING)
-fantom_logger.addHandler(stream_handler)
+
+
+# # file
+# if os.path.exists("./logs/fantom.log"):
+#     os.remove("./logs/fantom.log")
+# file_handler = RotatingFileHandler('./logs/fantom.log', 'a', 1000000, 1)
+# file_handler.setLevel(logging.DEBUG)
+# file_handler.setFormatter(formatter)
+# fantom_logger.addHandler(file_handler)
+# # stream
+# stream_handler = logging.StreamHandler()
+# stream_handler.setLevel(logging.WARNING)
+# fantom_logger.addHandler(stream_handler)
 
 
 class Player():
@@ -64,14 +66,30 @@ class Player():
         response = self.answer(data)
         # send back to server
         bytes_data = json.dumps(response).encode("utf-8")
-        protocol.send_json(self.socket, bytes_data)
+        Protocol.send(self.socket, bytes_data)
+
+    def authenticate(self):
+        print("Trying to authenticate", flush=True)
+        Protocol.send_string(self.socket, "fantom connection random@epitech.eu")
+        print("Asked for authentication", flush=True)
+        auth_resp = Protocol.receive_string(self.socket)
+        print("Received response : " + auth_resp, flush=True)
+
+        if not auth_resp == "connection accepted":
+            self.reset()
+            return False
+        return True
 
     def run(self):
-
+        print("Trying to connect")
         self.connect()
+        print("Connected")
+
+        if not self.authenticate():
+            return
 
         while self.end is not True:
-            received_message = protocol.receive_json(self.socket)
+            received_message = Protocol.receive(self.socket)
             if received_message:
                 self.handle_json(received_message)
             else:

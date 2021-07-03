@@ -1,48 +1,78 @@
-import cProfile
+import signal
 import sys
+from logging import Logger
+import socket
+from threading import Thread
+from time import sleep
+import os
 
-from src.Game import Game
-from src.Player import Player
-from src.globals import logger, clients, link
+from src.network.Client import Client
+import src.utils.globals as glob
+from src.network.Matchmaking import matchmaking
+from src.utils.csv_manager import csv_stats_file, auto_flush_file
 
 """
-    The order of connexion of the sockets is important.
-    inspector is player 0, it must be represented by the first socket.
-    fantom is player 1, it must be representer by the second socket.
+    This is the main file of the game server
 """
 
 
-def init_connexion():
-    while len(clients) != 2:
-        link.listen(2)
-        (clientsocket, addr) = link.accept()
-        logger.info("Received client !")
-        clients.append(clientsocket)
-        clientsocket.settimeout(10)
+def handle_connections(connectionSock: socket, logger: Logger):
+
+    connectionSock.listen(5)
+    try:
+        while glob.server_running:
+            sleep(0.02)
+            (clientsocket, addr) = connectionSock.accept()
+            logger.info("New client has logged on !")
+            glob.current_thread_id += 1
+            clientsocket.settimeout(10)
+            client = Client(clientsocket, glob.current_thread_id, logger)
+            with glob.lockWaitingClients:
+                glob.waiting_clients.append(client)
+    except OSError:
+        logger.info("Closing the network")
+
+
+def sigint_handler(signum, frame):
+    pass
 
 
 if __name__ == '__main__':
-    players = [Player(0), Player(1)]
-    scores = []
+    sock: socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    host: str = ''
+    port = int(os.environ.get("PORT", 12000))
+    sock.bind((host, port))
 
-    logger.info("no client yet")
-    init_connexion()
-    logger.info("received all clients")
+    _logger = glob.create_main_logger()
+    _logger.info("Launching server ...")
 
-    # profiling
-    pr = cProfile.Profile()
-    pr.enable()
+    handlerThread = Thread(target=handle_connections, args=(sock, _logger,))
+    handlerThread.start()
 
-    game = Game(players)
-    game.lancer()
+    matchmakingThread = Thread(target=matchmaking, args=(_logger,))
+    matchmakingThread.start()
 
-    link.close()
+    statFileThread = Thread(target=auto_flush_file, args=(csv_stats_file,))
+    statFileThread.start()
 
-    # profiling
-    pr.disable()
-    # stats_file = open("{}.txt".format(os.path.basename(__file__)), 'w')
-    stats_file = open("./logs/profiling.txt", 'w')
-    sys.stdout = stats_file
-    pr.print_stats(sort='time')
+    signal.signal(signal.SIGINT, sigint_handler)
+
+    _logger.info("Server successfully started !")
+
+    while glob.server_running:
+        command = input()
+        if command == "quit":
+            _logger.info("Server shutdown !")
+            glob.server_running = False
+            sock.close()
+
+    for roomKey in glob.roomThreads:
+        glob.roomThreads[roomKey].join()
+    handlerThread.join()
+    matchmakingThread.join()
+    statFileThread.join()
+
+    csv_stats_file.close()
 
     sys.stdout = sys.__stdout__

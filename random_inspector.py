@@ -5,7 +5,8 @@ import random
 import socket
 from logging.handlers import RotatingFileHandler
 
-import protocol
+from src.network import Protocol
+
 
 host = "localhost"
 port = 12000
@@ -18,17 +19,17 @@ inspector_logger = logging.getLogger()
 inspector_logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter(
     "%(asctime)s :: %(levelname)s :: %(message)s", "%H:%M:%S")
-# file
-if os.path.exists("./logs/inspector.log"):
-    os.remove("./logs/inspector.log")
-file_handler = RotatingFileHandler('./logs/inspector.log', 'a', 1000000, 1)
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(formatter)
-inspector_logger.addHandler(file_handler)
-# stream
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.WARNING)
-inspector_logger.addHandler(stream_handler)
+# # file
+# if os.path.exists("./logs/inspector.log"):
+#     os.remove("./logs/inspector.log")
+# file_handler = RotatingFileHandler('./logs/inspector.log', 'a', 1000000, 1)
+# file_handler.setLevel(logging.DEBUG)
+# file_handler.setFormatter(formatter)
+# inspector_logger.addHandler(file_handler)
+# # stream
+# stream_handler = logging.StreamHandler()
+# stream_handler.setLevel(logging.WARNING)
+# inspector_logger.addHandler(stream_handler)
 
 
 class Player():
@@ -65,14 +66,25 @@ class Player():
         response = self.answer(data)
         # send back to server
         bytes_data = json.dumps(response).encode("utf-8")
-        protocol.send_json(self.socket, bytes_data)
+        Protocol.send(self.socket, bytes_data)
+
+    def authenticate(self):
+        Protocol.send_string(self.socket, "inspector connection random@epitech.eu")
+        auth_resp = Protocol.receive_string(self.socket)
+
+        if not auth_resp == "connection accepted":
+            self.reset()
+            return False
+        return True
 
     def run(self):
-
         self.connect()
 
+        if not self.authenticate():
+            return
+
         while self.end is not True:
-            received_message = protocol.receive_json(self.socket)
+            received_message = Protocol.receive(self.socket)
             if received_message:
                 self.handle_json(received_message)
             else:
