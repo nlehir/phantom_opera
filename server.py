@@ -25,7 +25,7 @@ def handle_connections(connectionSock: socket, logger: Logger):
             (clientsocket, addr) = connectionSock.accept()
             logger.info("New client has logged on !")
             glob.current_thread_id += 1
-            clientsocket.settimeout(500)
+            clientsocket.settimeout(10)
             client = Client(clientsocket, glob.current_thread_id, logger)
             with glob.lockWaitingClients:
                 glob.waiting_clients.append(client)

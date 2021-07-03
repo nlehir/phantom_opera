@@ -33,7 +33,7 @@ roomThreads: Dict[UUID, Thread] = {}
 # or after moving
 permanents = {"pink"}
 before = {"purple", "brown"}
-after = {"black", "white", "red"}
+after = {"black", "white", "red", "blue", "grey"}
 
 # reunion of sets
 colors = {"pink",
