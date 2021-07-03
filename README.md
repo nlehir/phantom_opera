@@ -18,7 +18,11 @@
 2. `python3.7 inspector.py`
 
 3. `python3.7 random.fantom.py`
- 
+
+## Commands on the server
+
+`quit` exit the server in a clean way
+
 ## Technical information
 
 To connect a client to the server you need an authentication,
