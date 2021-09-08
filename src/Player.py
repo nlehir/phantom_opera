@@ -309,6 +309,7 @@ class Player:
                             'Choosing random exit.'
                         )
                         logger.warning(warning_message)
+                        __import__('ipdb').set_trace()
                         selected_exit = choice(passages_work)
 
                     else:
@@ -331,8 +332,6 @@ class Player:
         characters_in_room = [
             q for q in game.characters if q.position == charact.position]
         number_of_characters_in_room = len(characters_in_room)
-        # print(f"characters in room {characters_in_room}")
-        # print(f"number of characters in room: {number_of_characters_in_room}")
 
         # get the available rooms from a given position
         available_rooms = list()
@@ -357,9 +356,9 @@ class Player:
         temp = set(temp)
         available_positions = list(temp)
 
-        # test
-        # print(available_positions)
-        # print(game.blocked)
+        # ensure the character changes room
+        if charact.position in available_positions:
+            available_positions.remove(charact.position)
 
         # if the character is purple and the power has
         # already been used, we pass since it was already moved
