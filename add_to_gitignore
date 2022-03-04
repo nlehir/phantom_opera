@@ -1,0 +1,10 @@
+add_to_gitignore
+changelog.txt
+le-fantome-de-l-opera_rules_fr.pdf
+logs/
+src/
+project_description.pdf
+protocol.py
+random_fantom.py
+random_inspector.py
+server.py

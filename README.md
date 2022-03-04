@@ -24,6 +24,8 @@ You can set the level of importance of the logging messages :
 Brown character : takes the moved character to his final position, instead of
 any position on the path taken by the brown character.
 
+End of game : TODO
+
 ## Todo
 
 Edit protocol and server so that the players could connect in whatever order.
