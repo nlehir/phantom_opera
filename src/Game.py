@@ -183,14 +183,12 @@ class Game:
             or the singer leaves the opera.
         """
         # work
-        while self.position_carlotta < self.exit and len(
-                [p for p in self.characters if p.suspect]) > 1:
+        nb_suspects = len([p for p in self.characters if p.suspect])
+        while self.position_carlotta < self.exit and  nb_suspects > 1:
             self.tour()
         # game ends
         if self.position_carlotta < self.exit:
-            logger.info(
-                "----------\n---- inspector wins : fantom is " + str(
-                    self.fantom))
+            logger.info(f"----------\n---- inspector wins : fantom is {self.fantom}")
         else:
             logger.info("----------\n---- fantom wins")
         # log
@@ -205,8 +203,7 @@ class Game:
         message = f"Tour: {self.num_tour},\n" \
             f"Position Carlotta / exit: {self.position_carlotta}/{self.exit},\n" \
             f"Shadow: {self.shadow},\n" \
-            f"blocked: {self.blocked}".join(
-                ["\n" + str(p) for p in self.characters])
+            f"blocked: {self.blocked}".join(["\n" + str(p) for p in self.characters])
         return message
 
     def update_game_state(self, player_role):
