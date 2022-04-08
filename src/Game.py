@@ -186,6 +186,7 @@ class Game:
         nb_suspects = len([p for p in self.characters if p.suspect])
         while self.position_carlotta < self.exit and  nb_suspects > 1:
             self.tour()
+            nb_suspects = len([p for p in self.characters if p.suspect])
         # game ends
         if self.position_carlotta < self.exit:
             logger.info(f"----------\n---- inspector wins : fantom is {self.fantom}")
